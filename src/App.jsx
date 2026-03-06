@@ -262,7 +262,7 @@ const RECIPE_DB = {
 "牛赤身肉のスタミナ炒め丼＋パプリカナムル＋オレンジ":["牛赤身肉80gを3cm幅に切り、醤油・おろしニンニク各小さじ1を揉み込む|フライパンに油少々を熱し、牛肉とスライスした玉ねぎ50gを中火で4分炒め、ご飯にのせる|細切りにしたパプリカをレンジで1分加熱し、ごま油と塩各少々で和える|オレンジを半分に切り添える","牛赤身のヘム鉄とパプリカ・オレンジのビタミンCにより、鉄の吸収率が最大化。持久力維持に直結するメニューです [2, 8, 10]。","炒め物は多めに作り、小分けにしてお弁当用に冷凍（1週間）可能です。"],
 "鶏むね肉とブロッコリーのレモンパスタ＋ヨーグルト":["パスタ100gを沸騰した湯で表示通り茹でる（終了2分前にブロッコリー60gも入れ一緒に茹でる）|鶏むね肉80gを削ぎ切りにし、フライパンで中火で両面3分ずつ焼き火を通す|茹で上がったパスタ、ブロッコリー、鶏肉、レモン汁15ml、オリーブオイル10ml、塩胡椒少々をボウルで和える|ヨーグルト100gを添える","低脂質高タンパクな鶏肉と糖質のパスタでエネルギーを確保。クエン酸が疲労物質の除去を早めます [2, 9]。",""],
 "あさりのクラムチャウダー＋全粒粉パン＋リンゴ":["じゃがいも60gと人参30gを1cm角に切り、水100mlとコンソメ1個で柔らかくなるまで約8分煮る|あさり水煮缶50gを汁ごと加え、牛乳200mlを入れて沸騰直前まで弱火で温める|全粒粉パン2枚をトーストする|リンゴ0.5個をカットして添える","あさりの鉄分と全粒粉パンのビタミンB1を組み合わせ、持続的なエネルギー産生をサポートします [2, 13]。","チャウダーは冷蔵で2日間保存可能。翌日はパンを変えるだけでバリエーションが出せます。"],
-"豚ロースの生姜焼き丼＋キャベツと海藻のサラダ":["豚肉80gとスライスした玉ねぎ60gを、生姜、醤油、みりん（各小さじ2）を合わせたタレで中火で4分炒める|ご飯250gの上に生姜焼きを盛り付ける|千切りキャベツ50gと水で戻したわかめ3gを混ぜ、好みでポン酢少々（分量外）をかける","豚肉のB1と玉ねぎのアリシンが結合し、エネルギー代謝を長時間持続させます。海藻でミネラルを補給します 。","肉をタレに漬け込んだ状態で冷凍しておけば、当日は焼くだけで10分以内に完成します。"],
+"豚ロースの生姜焼き丼＋キャベツと海藻のサラダ":["小さなボウルにおろし生姜小さじ1、醤油小さじ2、みりん小さじ2を混ぜ合わせてタレを作る|玉ねぎ60gを5mm幅にスライスする。フライパンに油を熱し、豚肉80gと玉ねぎを中火で3分炒める|タレを回し入れ、全体に絡めながらさらに1分炒める|ご飯250gの上に生姜焼きを盛り付ける|千切りキャベツ50gと水で戻したわかめ3gを混ぜ、好みでポン酢少々（分量外）をかける","豚肉のB1と玉ねぎのアリシンが結合し、エネルギー代謝を長時間持続させます。海藻でミネラルを補給します 。","肉をタレに漬け込んだ状態で冷凍しておけば、当日は焼くだけで10分以内に完成します。"],
 "鮭とさつまいもの彩り弁当＋おにぎり":["鮭1切に塩少々を振り、グリルまたはフライパンで両面を4分ずつ中火で焼く|さつまいも80gを1cm厚さの輪切りにし、耐熱容器に入れ水少々を加えレンジで3分加熱する|ブロッコリー50gをレンジで1分加熱し、鮭、さつまいもと共にお弁当箱に詰める|ご飯をおにぎり2個にし、ごまを振る","さつまいもは持久運動に適した低GIの糖質源です。鮭のビタミンDが骨の強化をサポートします [2, 6]。","蒸したさつまいもは小分けにして冷凍保存しておくと、お弁当の隙間埋めに重宝します。"],
 "豆腐とひき肉の麻婆ナス丼＋トマトサラダ":["ナス1本を乱切りにし、フライパンでひき肉60gと共に中火で3分炒める|水100ml、味噌大さじ1、醤油小さじ1を加え、2cm角に切った豆腐100gを入れて弱火で3分煮る|片栗粉小さじ1を水で溶いて回し入れ、とろみがついたらご飯にのせる|くし形に切ったトマトを添える","豚肉のB1と豆腐のタンパク質、ナスの水分を一度に摂取。トマトの抗酸化成分が細胞の回復を促します [2, 4]。",""],
 "レバー入りハンバーグ＋カボチャの田楽＋トマトスープ＋ライス":["鶏レバー20gを茹でて細かく刻み、ひき肉80g、みじん切り玉ねぎ、塩少々と混ぜて丸める|フライパンに油を熱し、中火で両面を5分ずつ、蓋をして蒸し焼きにする|カボチャ60gをレンジで3分加熱し、味噌大さじ1/2、砂糖小さじ1を混ぜたタレを塗る|トマト1/2個をコンソメスープに入れてひと煮立ちさせる","持久力に欠かせない鉄分をレバーで、糖質をカボチャとライスでしっかり確保。ビタミンC（トマト）で吸収を助けます [4, 14, 15]。","ハンバーグは焼く前の状態で1個ずつラップし冷凍（2週間）可能です。"],
@@ -294,10 +294,10 @@ const RECIPE_DB = {
 "鯖の塩焼きと具沢山豚汁の定食":["鯖をグリルで焼く（または市販の焼き鯖を温める）|鍋でだし汁を沸騰させ、切った大根、にんじん、里芋、豚肉を入れる。アクを取りながら中火で10分煮る|野菜が柔らかくなったら火を止め、味噌を溶き入れる|たっぷりの豚汁と鯖、ごはんで提供する","鯖の良質な脂（EPA）が血液の流れをスムーズにし、筋肉への栄養運搬を助けます。豚汁で野菜を多く摂ることで、微量ミネラルを補完します。","豚汁は2〜3日分まとめて作っておくと非常に便利。"],
 "鶏胸ひき肉とチーズの「成長きんちゃく」煮":["干ししいたけを水で戻し、みじん切りにする。ニラも細かく切る|ボウルにひき肉、しいたけ、ニラを入れ、よく練り混ぜる|油揚げを半分に切り、肉ダネと5mm角のチーズを等分に詰める。口を楊枝で止める|鍋に水、めんつゆ、しいたけの戻し汁を入れて沸騰させ、きんちゃくを並べる。中火で蓋をして8分煮る。裏返してさらに4分煮る","鶏肉（タンパク質）×油揚げ（植物性タンパク質）×チーズ（乳タンパク・カルシウム）を一度に摂取できます。干ししいたけのビタミンDがカルシウム定着を促します。","煮汁ごと冷蔵保存し、翌日のお弁当にも。"],
 "鶏肉と白菜・豆苗のカルシウムクリーム煮":["鶏肉は一口大、白菜は3cm幅、豆苗は半分に切る|フライパンにバターを溶かし、鶏肉を中火で炒める。色が変わったら白菜を加え、しんなりするまで炒める|小麦粉を振り入れ、粉っぽさがなくなるまで混ぜる。牛乳とコンソメを加え、とろみがつくまで弱火で5分煮込む|最後に豆苗を加え、さっと火を通して完成","牛乳200mlを丸ごと使い、成長期の骨格形成を強力にバックアップします。豆苗に含まれるビタミンKは、カルシウムを骨に結びつける「ボンド」の役割を果たします。","冷蔵で2日間保存可能。"],
-"チーズかまぼこと豚肉の回鍋肉スタミナ丼":["キャベツ、ピーマン、チーズかまぼこを一口大に、豚肉は3cm幅に切る|フライパンで豚肉を炒め、脂が出てきたら野菜とかまぼこを加え、強火で2分炒める|合わせ調味料（味噌、醤油、砂糖、生姜）を一気に回し入れ、全体に絡める|器にごはんを盛り、その上にかける","豚肉のビタミンB1とチーズかまぼこのカルシウム・魚肉タンパク質が、疲労回復と組織合成を同時に行います。","特になし。"],
+"チーズかまぼこと豚肉の回鍋肉スタミナ丼":["キャベツ、ピーマン、チーズかまぼこを一口大に、豚肉は3cm幅に切る|小さなボウルに味噌大さじ1、醤油小さじ1、砂糖小さじ1、おろし生姜少々を混ぜ合わせておく|フライパンで豚肉を炒め、脂が出てきたら野菜とかまぼこを加え、強火で2分炒める|合わせておいた調味料を一気に回し入れ、全体に絡める|器にごはんを盛り、その上にかける","豚肉のビタミンB1とチーズかまぼこのカルシウム・魚肉タンパク質が、疲労回復と組織合成を同時に行います。","特になし。"],
 "エリンギとかぼちゃのカレー風味つくね":["エリンギはみじん切りにし、ひき肉とカレー粉と共によく混ぜ、丸く成形する|かぼちゃは5mm厚さに切る。フライパンに油を引き、つくねとかぼちゃを並べ、蓋をして中火で両面を3分ずつ焼く|調味料を加え、煮絡める。サイドメニューとしてインスタントのコーンポタージュ（牛乳で作成）を添える","かぼちゃのβ-カロテン（ビタミンA）が粘膜や皮膚を保護し、免疫力を高めます。カレー粉のスパイスが食欲を刺激し、夕食の摂取量を維持します。","つくねは多めに作って冷凍保存可能。"],
 "なすと豚肉のスタミナ生姜炒め定食":["なすとピーマンを乱切りにする。豚肉は3cm幅に切る|フライパンで豚肉を炒め、火が通ったらなすを加え、肉の脂を吸わせるように炒める|ピーマンと調味料を加え、強火で1分炒める|豆腐たっぷりの味噌汁、ごはんと共に配膳する","なすには抗酸化作用のあるアントシアニンが含まれ、運動による酸化ダメージを抑制します。豚肉との相性が良く、タンパク質を効率的に摂取できます。","特になし。"],
-"レンジで簡単！高タンパクよだれ鶏":["鶏胸肉にフォークで全体に穴を開け、酒（分量外）を振ってラップをし、電子レンジ600Wで4分30秒加熱する。そのまま5分放置して余熱で火を通す|もやしを耐熱容器に入れ、レンジで1分30秒加熱して水気を切る|鶏肉をスライスし、もやしの上にのせ、合わせたタレをかける。デザートにヨーグルトを添える","鶏胸肉には疲労回復成分「イミダゾールジペプチド」が凝縮されており、翌日のパフォーマンス低下を防ぎます。ヨーグルトでカルシウムも補填します。","蒸し鶏の状態で2日間保存可能。"],
+"レンジで簡単！高タンパクよだれ鶏":["鶏胸肉にフォークで全体に穴を開け、酒（分量外）を振ってラップをし、電子レンジ600Wで4分30秒加熱する。そのまま5分放置して余熱で火を通す|もやしを耐熱容器に入れ、レンジで1分30秒加熱して水気を切る|小さなボウルに醤油大さじ1、酢大さじ1、ごま油大さじ1/2、砂糖小さじ1を入れてよく混ぜ、タレを作る|鶏肉を5mm幅にスライスし、もやしの上にのせ、タレを回しかける。あれば砕いたピーナッツを散らす。デザートにヨーグルトを添える","鶏胸肉には疲労回復成分「イミダゾールジペプチド」が凝縮されており、翌日のパフォーマンス低下を防ぎます。ヨーグルトでカルシウムも補填します。","蒸し鶏の状態で2日間保存可能。"],
 "ほうれん草と厚揚げのふわとろ親子丼":["小鍋に水とめんつゆ、スライスした玉ねぎ、一口大の鶏肉を入れて沸騰させる|鶏肉に火が通ったら、角切りにした厚揚げと3cmに切ったほうれん草を加える|溶き卵を回し入れ、蓋をして30秒蒸らして火を止める|器に盛ったごはんにのせる","鶏肉と卵のアニマルタンパクに、厚揚げとほうれん草のカルシウムをプラス。親子丼に厚揚げを入れることで、成長期に必要な咀嚼数と栄養密度を高めています。","具材のカットは朝に済ませておく。"],
 "疲労回復タコライス（チーズ・トマト増量）":["フライパンでひき肉を炒め、脂をキッチンペーパーで軽く拭き取る。ケチャップ、ソース、カレー粉で味付けする|皿にごはんを盛り、ちぎったレタス、角切りにしたトマト、ひき肉、チーズの順にたっぷりのせる|食べる直前によく混ぜる","合挽肉から鉄分、チーズからカルシウムを効率よく摂取。トマトのリコピンが、ハードな練習による体内の活性酸素を除去し、回復を早めます。","タコミートはまとめて作って冷凍保存可能。"],
 "練習直後の黄金比！肉まんと牛乳":["肉まんを水で軽く濡らし、ラップをしてレンジで約1分加熱する|牛乳と共に、練習終了後20分以内に摂取する","炭水化物（皮）とタンパク質（具・牛乳）を3:1の黄金比率で摂ることで、インスリンの分泌を促し、筋肉へアミノ酸を強力に運び込みます。",""],
@@ -321,7 +321,7 @@ const RECIPE_DB = {
 "鮭とキュウリの彩り五目まぜ寿司":["酢、砂糖、塩を混ぜ合わせ、温かいご飯に回しかけて切るように混ぜ、酢飯を作る。|キュウリを5mm角の小さなダイス状に切る。|酢飯に鮭とキュウリを加え、均一になるようにさっくり混ぜる。|器に盛り、上に錦糸卵を散らす。","鮭の赤い色素アスタキサンチンには強力な抗酸化作用があり、筋肉の炎症を鎮めます。酢のクエン酸がエネルギー産生サイクルを回します。","鮭のほぐし身を常備しておくと便利。"],
 "赤身牛ステーキ・リカバリーピラフセット":["牛肉を1.5cm角に切り、塩胡椒で下味をつける。ブロッコリーは小さめの小房に分け、レンジで1分加熱する。|フライパンに少量の油とニンニクを入れ、弱火で香りを出し、ニンニクを取り出す。|牛肉を中火で入れ、表面がこんがりするまで2分焼き、一度取り出す。|同じフライパンにご飯、ブロッコリー、コーンを入れ、醤油を回しかけて強火で1分炒める。|肉を戻し入れ、全体をさっと混ぜ合わせる。","牛赤身肉のヘム鉄とブロッコリーのビタミンCは、貧血予防に最も効果的な組み合わせです。ニンニクがビタミンB1の吸収を高めます。","牛肉のカットを済ませておけば時短。"],
 "カツオのたたき・香味野菜サラダ":["玉ねぎを繊維に垂直に薄切りし、水に3分さらして水気を絞る。大葉とミョウガは千切りにする。|カツオを1cm幅に切り、器の円周に沿って並べる。|中央に玉ねぎ、大葉、ミョウガをたっぷりと盛る。|レモン汁を全体に絞り、ポン酢を回しかける。","カツオはアスリートに必須の鉄分とB12が豊富です。生の野菜とレモンからビタミンCを摂ることで、鉄の吸収率が3〜5倍に跳ね上がります。","香味野菜のカットを朝に済ませておく。"],
-"鶏レバーとパプリカの甘辛スピード炒め":["レバーを一口大に切り、流水で3回洗い、キッチンペーパーで水分を拭き取って片栗粉をまぶす。|パプリカとピーマンを乱切りにする。|フライパンに多めの油（分量外）を熱し、レバーを中火で両面しっかり3分ずつ焼く。|野菜を加え、強火で1分炒める。|合わせた調味料を一気に入れ、タレがとろっとしてレバーに絡むまで加熱する。","レバーはヘム鉄の含有量が圧倒的です。ビタミンC含有量が野菜トップクラスの赤パプリカと合わせることで、吸収を極限まで高めます。","下処理済みのレバーを購入するとより簡単。"],
+"鶏レバーとパプリカの甘辛スピード炒め":["レバーを一口大に切り、流水で3回洗い、キッチンペーパーで水分を拭き取って片栗粉をまぶす。|パプリカとピーマンを乱切りにする。|小さなボウルに醤油大さじ1、砂糖大さじ1、酒大さじ1、酢小さじ1を混ぜ合わせておく。|フライパンに多めの油（分量外）を熱し、レバーを中火で両面しっかり3分ずつ焼く。|野菜を加え、強火で1分炒める。|合わせておいた調味料を一気に入れ、タレがとろっとしてレバーに絡むまで加熱する。","レバーはヘム鉄の含有量が圧倒的です。ビタミンC含有量が野菜トップクラスの赤パプリカと合わせることで、吸収を極限まで高めます。","下処理済みのレバーを購入するとより簡単。"],
 "豚肉とニラのジューシー水餃子":["ニラと白菜をみじん切りにし、豚肉と混ぜ合わせ、軽く塩胡椒（分量外）をして餡を作る。|餃子の皮の縁に水をつけ、中央に餡を置いて半分に折り、ひだを作って包む。|鍋に水500mlと鶏ガラスープの素を入れ、強火で沸騰させる。|餃子を入れ、浮き上がってきてからさらに2分間茹でる。|器に盛り、醤油と酢を合わせたタレを添える。","焼くよりも茹でることで余分な脂質が落ち、夜の消化負担が軽減されます。ニラのアリシンが豚肉のビタミンB1を活性化させます。","包んだ状態で冷凍保存しておけば、次回は茹でるだけ。"],
 "生鮭とキノコのホイル包み蒸し":["アルミホイルを30cmほど広げ、スライスした玉ねぎを中央に敷く。|鮭を乗せ、その上にほぐしたしめじとバターを置く。|ホイルを隙間がないようにしっかり包み込む。|フライパンに1cmほど水を張り、ホイルを置いて蓋をし、中火で10分蒸し焼きにする。|仕上げに醤油を垂らし、レモンを添える。","鮭とキノコのダブルでビタミンDを補給でき、牛乳などのカルシウムを骨に定着させます。蒸し調理は栄養の損失が少ないのが利点です。","ホイルに包む工程までを朝に済ませる。"],
 "鶏むね肉のさっぱりみぞれ煮":["鶏肉を一口大のそぎ切りにし、片栗粉を薄くまぶす。大根はすりおろして軽く水分を切る。|フライパンに少量の油（分量外）を熱し、鶏肉を両面が白くなるまで中火で焼く。|ポン酢と水を加え、蓋をして弱火で3分蒸し煮にする。|大根おろしを加え、全体をさっと混ぜて一煮立ちさせる。","大根おろしの酵素が鶏肉のタンパク質分解を助け、吸収を早めます。鶏むね肉特有の成分が、活性酸素を抑えて疲労を根本から除去します。","大根をおろして冷凍保存しておくと時短。"],
@@ -347,9 +347,9 @@ const RECIPE_DB = {
 "力うどん（餅2個入り）":["鍋に水300mlとめんつゆ50mlを入れて火にかける|切り餅2個をトースターで表面がぷっくり膨らむまで4分間焼く|鍋が沸騰したら冷凍うどんを入れ、麺がほぐれるまで中火で加熱する|器にうどんとつゆを盛り、焼きたての餅2個とかまぼこ2枚をのせる。","うどんと餅を組み合わせることで、1食で120g以上の炭水化物を効率よく摂取できる。試合当日の昼に最適 。","不可。"],
 "さば水煮缶の「洋風ちらし寿司」":["炊きたての温かいごはん250gにすし酢を回しかけ、うちわで仰ぎながら切るように混ぜて冷ます|さば水煮缶の身50gをボウルで粗くほぐす|きゅうり1/4本を5mm角の小さなサイコロ状に切る|酢飯にさばときゅうりを加え、全体をさっくりと混ぜ合わせる|器に盛り付け、市販の錦糸卵を彩りに散らす。","お酢に含まれるクエン酸が、失われたグリコーゲンの再合成を加速させる。さばの脂質はDHA/EPAが豊富で脳のコンディションを整える 。","酢飯は傷みにくいため、お弁当としても推奨される。"],
 "鶏むね挽肉の「ふんわり蒸し餃子」":["キャベツ1枚をみじん切りにし、塩少々（分量外）を振って5分置き、水気をきつく絞る|ボウルに鶏むね挽肉、絞ったキャベツ、醤油、酒、生姜を入れて、粘りが出るまでよく練る|餃子の皮の縁に水をつけ、中央に具をのせて半分に閉じ、ひだを作らずに平らに密閉する|耐熱皿にクッキングシートを敷き、餃子が重ならないように並べる|水大さじ1を全体に振りかけ、ラップをふんわり被せて600Wで5分加熱する|1分間蒸らしてから、ポン酢（分量外）を添えて提供する。","焼き餃子ではなく「蒸し」を選択することで調理油を完全排除。キャベツのビタミンUが胃腸を保護する 。","包んだ状態でバットに並べ、冷凍保存が可能。"],
-"牛赤身肉の「さっぱりおろし牛丼」":["牛モモ肉は脂身があればキッチンバサミで丁寧に取り除き、3cm幅に切る|玉ねぎを薄切りにする|小鍋にAと玉ねぎを入れて火にかけ、沸騰したら中火で2分煮る|牛肉を1枚ずつ広げながら加え、アクを丁寧に取り除き、肉の色が変わるまでさらに3分煮る|丼に大盛りごはん300gを盛り、具材とたっぷりのつゆをかける|中央に大根おろしをのせて完成。","牛モモ肉はヘム鉄が豊富で、血液の質を高める。脂身を除くことで、試合前日でも安全に牛肉を摂取できる 。","具材は前日に調理し、冷蔵保存可能。"],
-"お餅の肉巻き・甘辛照り焼き（ヒレ肉使用）":["切り餅3個をそれぞれ縦半分に切り、計6本の棒状にする|豚ヒレ肉を広げ、餅1本につき肉1枚を隙間なく巻きつける|表面に片栗粉を薄くまぶし、余分な粉をはたく|フライパンにクッキングシートを敷き、巻き終わりを下にして並べ、中火で焼く|全面に焼き色がつくまで転がしながら5分焼き、餅が柔らかくなったのを確認する|調味料を全て混ぜて回し入れ、強火でタレを煮絡めて照りを出す。","糖質の塊である餅を、ビタミンB1豊富な豚肉で巻くことで、燃焼効率を最大化する。ヒレ肉を使うのが低脂質の秘訣 。","加熱前の状態で1つずつラップし、冷凍保存可能。"],
-"豚ヒレ肉の「柔らか甘辛煮」定食":["豚ヒレ肉を1cm厚さの輪切りにし、ラップを被せて瓶の底などで叩いて5mm厚さに伸ばす|肉の表面に片栗粉を薄くまぶす|小フライパンにAを入れて中火で沸騰させる|肉を重ならないように並べ入れ、片面2分ずつ煮る|タレにとろみがつき、肉にしっかりと絡んだら火を止める|器にごはんと共に盛り付け、茹でたブロッコリー1房を添える。","豚ヒレ肉は全部位の中で最もビタミンB1が多く、かつ脂質が極めて低い。叩いて伸ばすことで消化も良くなる 。","加熱後、密閉容器で冷蔵1日保存可能。"],
+"牛赤身肉の「さっぱりおろし牛丼」":["牛モモ肉は脂身があればキッチンバサミで丁寧に取り除き、3cm幅に切る|玉ねぎを薄切りにする|小鍋に水100ml、醤油大さじ2、みりん大さじ2、砂糖大さじ1、酒大さじ1と玉ねぎを入れて火にかけ、沸騰したら中火で2分煮る|牛肉を1枚ずつ広げながら加え、アクを丁寧に取り除き、肉の色が変わるまでさらに3分煮る|丼に大盛りごはん300gを盛り、具材とたっぷりのつゆをかける|中央に大根おろしをのせて完成。","牛モモ肉はヘム鉄が豊富で、血液の質を高める。脂身を除くことで、試合前日でも安全に牛肉を摂取できる 。","具材は前日に調理し、冷蔵保存可能。"],
+"お餅の肉巻き・甘辛照り焼き（ヒレ肉使用）":["切り餅3個をそれぞれ縦半分に切り、計6本の棒状にする|豚ヒレ肉を広げ、餅1本につき肉1枚を隙間なく巻きつける|表面に片栗粉を薄くまぶし、余分な粉をはたく|フライパンにクッキングシートを敷き、巻き終わりを下にして並べ、中火で焼く|全面に焼き色がつくまで転がしながら5分焼き、餅が柔らかくなったのを確認する|醤油大さじ1、みりん大さじ1、砂糖小さじ1を混ぜて回し入れ、強火でタレを煮絡めて照りを出す。","糖質の塊である餅を、ビタミンB1豊富な豚肉で巻くことで、燃焼効率を最大化する。ヒレ肉を使うのが低脂質の秘訣 。","加熱前の状態で1つずつラップし、冷凍保存可能。"],
+"豚ヒレ肉の「柔らか甘辛煮」定食":["豚ヒレ肉を1cm厚さの輪切りにし、ラップを被せて瓶の底などで叩いて5mm厚さに伸ばす|肉の表面に片栗粉を薄くまぶす|小フライパンに水50ml、醤油大さじ1、みりん大さじ1、砂糖小さじ1を入れて中火で沸騰させる|肉を重ならないように並べ入れ、片面2分ずつ煮る|タレにとろみがつき、肉にしっかりと絡んだら火を止める|器にごはんと共に盛り付け、茹でたブロッコリー1房を添える。","豚ヒレ肉は全部位の中で最もビタミンB1が多く、かつ脂質が極めて低い。叩いて伸ばすことで消化も良くなる 。","加熱後、密閉容器で冷蔵1日保存可能。"],
 "タラと豆腐の「みぞれあんかけ」定食":["鍋に水200mlとめんつゆ大さじ2を入れ、中火で沸騰させる|豆腐を一口大のサイコロ状に切り、タラは半分に切って鍋に入れる|中火で5分間煮て、魚に完全に火を通す|大根おろしを加え、再び沸騰したら水溶き片栗粉を回し入れてとろみをつける|器にたっぷりと盛り、温かいごはんと共に提供する。","試合前夜の過度な緊張で胃が重い選手にとって、最高に消化が良いメニュー。大根の消化酵素が内臓の負担を減らす 。","不可。"],
 "鶏ささみとじゃがいもの「コンソメ蒸し」":["じゃがいも1個を皮を剥き、5mm厚さの半月切りにする|鶏ささみは筋を取り、一口大の削ぎ切りにする|耐熱皿にじゃがいもを敷き詰め、その上にささみを重ならないように並べる|コンソメ小さじ1を水大さじ2で溶いて全体に回しかけ、ラップを密閉するように被せる|600Wのレンジで6分間加熱し、じゃがいもに竹串がスッと通るまで蒸らす|ごはんの横に盛り付けて完成。","米だけでなくじゃがいも（炭水化物）を追加することで、筋グリコーゲンの貯蔵量を多角的に増やす 。","前日にじゃがいもをカットして水に浸けておけば、当日は5分で完成。"],
 "むきエビと卵の「ふわふわ中華あんかけ」":["小鍋に水200mlと鶏ガラスープの素を入れ、中火で沸騰させる|むきエビを加え、赤くなるまで2分間煮る|片栗粉を同量の水で溶き、鍋に加えてしっかりとしたとろみをつける|溶き卵を高い位置から細く流し入れ、大きく一度だけ混ぜて火を止める|丼にごはん250gを盛り、上からふわふわのあんをかける。","エビは高タンパク低脂質で、疲労回復を助けるタウリンを豊富に含む。卵でビタミンB群を補う 。","不可。"],
@@ -426,21 +426,21 @@ function getRecipe(name) {
   return { steps: r[0].split("|"), tips: r[1], makeAhead: r[2] };
 }
 
-function sumNutrition(plan) {
+function sumNutrition(plan, skipKeys = []) {
   let cal = 0, p = 0, c = 0, f = 0;
   ["breakfast","lunch","dinner","snack"].forEach(k => {
-    if (!plan[k]) return;
+    if (!plan[k] || skipKeys.includes(k)) return;
     cal += plan[k].cal; p += plan[k].p; c += plan[k].c; f += plan[k].f;
     if (plan[k].extra) { cal += plan[k].extra.cal; p += plan[k].extra.p; c += plan[k].extra.c; f += plan[k].extra.f; }
   });
   return { cal, p, c, f };
 }
 
-function buildShoppingList(plans, servings) {
+function buildShoppingList(plans, servings, skipKeys = []) {
   const map = {};
   (Array.isArray(plans) ? plans : [plans]).forEach(plan => {
     ["breakfast","lunch","dinner","snack"].forEach(k => {
-      if (!plan[k]) return;
+      if (!plan[k] || skipKeys.includes(k)) return;
       plan[k].items.forEach(i => { if (!map[i.n]) map[i.n] = { ...i, q: 0 }; map[i.n].q += i.q * servings; });
       if (plan[k].extra) plan[k].extra.items.forEach(i => { if (!map[i.n]) map[i.n] = { ...i, q: 0 }; map[i.n].q += i.q * servings; });
     });
@@ -459,6 +459,70 @@ function buildShoppingList(plans, servings) {
 }
 
 function formatQty(q) { return Number.isInteger(q) ? String(q) : q === 0.5 ? "1/2" : q === 0.3 ? "1/3" : q.toFixed(1); }
+
+/* ── 買い物単位変換テーブル ──
+   レシピの調理単位 → スーパーで買うときの単位に変換
+   奥さんレビュー①対応: 「16片って何？」「122束って？」問題を解決 */
+const SHOPPING_UNIT_MAP = {
+  // 野菜
+  "ブロッコリー":   { from:"片", perUnit:12, toUnit:"株", toU:"株" },
+  "ほうれん草":     { from:"束", perUnit:1,  toUnit:"束", toU:"束", round:true },
+  "小松菜":         { from:"束", perUnit:1,  toUnit:"束", toU:"束", round:true },
+  "大根":           { from:"cm", perUnit:35, toUnit:"本", toU:"本" },
+  "にんじん":       { from:"本", perUnit:1,  toUnit:"本", toU:"本", round:true },
+  "キャベツ":       { from:"枚", perUnit:12, toUnit:"玉", toU:"玉" },
+  "白菜":           { from:"枚", perUnit:12, toUnit:"株(1/4)", toU:"株" },
+  "レタス":         { from:"枚", perUnit:10, toUnit:"玉", toU:"玉" },
+  "玉ねぎ":         { from:"個", perUnit:1,  toUnit:"個", toU:"個", round:true },
+  "ネギ":           { from:"cm", perUnit:40, toUnit:"本", toU:"本" },
+  "長ねぎ":         { from:"cm", perUnit:40, toUnit:"本", toU:"本" },
+  "長ネギ":         { from:"cm", perUnit:40, toUnit:"本", toU:"本" },
+  "ナス":           { from:"本", perUnit:1,  toUnit:"本", toU:"本", round:true },
+  "なす":           { from:"本", perUnit:1,  toUnit:"本", toU:"本", round:true },
+  "ピーマン":       { from:"個", perUnit:1,  toUnit:"個", toU:"個", round:true },
+  "トマト":         { from:"個", perUnit:1,  toUnit:"個", toU:"個", round:true },
+  "じゃがいも":     { from:"個", perUnit:1,  toUnit:"個", toU:"個", round:true },
+  "ジャガイモ":     { from:"個", perUnit:1,  toUnit:"個", toU:"個", round:true },
+  "カボチャ":       { from:"g",  perUnit:1200, toUnit:"個", toU:"個" },
+  "かぼちゃ":       { from:"g",  perUnit:1200, toUnit:"個", toU:"個" },
+  "さつまいも":     { from:"g",  perUnit:250, toUnit:"本", toU:"本" },
+  "バナナ":         { from:"本", perUnit:1,  toUnit:"本", toU:"本", round:true },
+  "もやし":         { from:"袋", perUnit:1,  toUnit:"袋", toU:"袋", round:true },
+  "ニラ":           { from:"束", perUnit:1,  toUnit:"束", toU:"束", round:true },
+  "豆苗":           { from:"パック", perUnit:1, toUnit:"パック", toU:"パック", round:true },
+  // 豆腐系
+  "豆腐":           { from:"丁", perUnit:1,  toUnit:"丁", toU:"丁", round:true },
+  "絹ごし豆腐":     { from:"丁", perUnit:1,  toUnit:"丁", toU:"丁", round:true },
+  "厚揚げ":         { from:"丁", perUnit:1,  toUnit:"枚", toU:"枚", round:true },
+  // 果物
+  "りんご":         { from:"個", perUnit:1,  toUnit:"個", toU:"個", round:true },
+  "リンゴ":         { from:"個", perUnit:1,  toUnit:"個", toU:"個", round:true },
+  "みかん":         { from:"個", perUnit:1,  toUnit:"個", toU:"個", round:true },
+  "キウイフルーツ": { from:"個", perUnit:1,  toUnit:"個", toU:"個", round:true },
+  "オレンジ":       { from:"個", perUnit:1,  toUnit:"個", toU:"個", round:true },
+};
+
+/** 買い物リスト用: 調理単位→買い物単位に変換して見やすくする */
+function toShoppingUnit(name, qty, unit) {
+  const rule = SHOPPING_UNIT_MAP[name];
+  if (rule && (rule.from === unit || unit === "g" && rule.from === "g")) {
+    const converted = qty / rule.perUnit;
+    const rounded = rule.round ? Math.ceil(converted) : Math.ceil(converted * 2) / 2; // 0.5刻みで切り上げ
+    const display = rounded <= 0 ? 1 : rounded;
+    return { q: display, u: rule.toU };
+  }
+  // g→キロ変換
+  if (unit === "g" && qty >= 1000) {
+    return { q: Math.round(qty / 100) / 10, u: "kg" };
+  }
+  // ml→リットル変換
+  if (unit === "ml" && qty >= 1000) {
+    return { q: Math.round(qty / 100) / 10, u: "L" };
+  }
+  // 端数丸め（小数第一位で十分）
+  const roundedQ = Math.ceil(qty * 10) / 10;
+  return { q: roundedQ, u: unit };
+}
 
 const FISH_INGREDIENTS = ["鮭","サバ","しらす","かつお","ツナ","鮭フレーク"];
 const MEAT_INGREDIENTS = ["鶏","豚","牛","合いびき","手羽","ウインナー"];
@@ -582,7 +646,8 @@ function MealCard({ mealType, meal, emoji, isPremium, dislikedNames, onAddExtra,
             {meal.tags.map((t, i) => <TagBadge key={i} tag={t} />)}
           </div>
         )}
-        <div style={{ display:"flex", gap:5, flexWrap:"wrap" }}>
+        <div style={{ display:"flex", gap:5, flexWrap:"wrap", alignItems:"center" }}>
+          <span style={{ fontSize:10, color:COLOR.textSub, fontWeight:600, marginRight:2 }}>1食分:</span>
           {[{ l:`${meal.cal}kcal`, c:"#e8913a" }, { l:`P${meal.p}g`, c:COLOR.accent }, { l:`C${meal.c}g`, c:COLOR.green }, { l:`F${meal.f}g`, c:COLOR.blue }].map((t, i) => (
             <span key={i} style={{ fontSize:11, padding:"3px 8px", borderRadius:5, background:t.c+"10", color:t.c, fontWeight:700 }}>{t.l}</span>
           ))}
@@ -718,6 +783,8 @@ export default function App() {
   const [showDislikeWall, setShowDislikeWall] = useState(false); // PY-03
   const [showWeeklyWall, setShowWeeklyWall]   = useState(false); // PY-04
   const [isFirstResult, setIsFirstResult]     = useState(true);  // PY-02
+  const [hasSchoolLunch, setHasSchoolLunch]   = useState(false); // v0.10: 給食あり切替
+  const [shoppingScope, setShoppingScope]     = useState("daily"); // v0.10: 買い物リスト対象
 
   const needs = sportId && ageId ? calcNeeds(ageId, sportId) : null;
   const sportObj = SPORTS.find(s => s.id === sportId);
@@ -751,6 +818,7 @@ export default function App() {
       setChecked({});
       setTab("meal");
       setWeeklyPlan(null);
+      setShoppingScope("daily");
       setIsFirstResult(true);
     }, 800);
   }
@@ -758,7 +826,9 @@ export default function App() {
   function handleRegenerate() {
     setLoading(true);
     setIsFirstResult(false);
-    setTimeout(() => { setDailyPlan(generateDailyPlan(goalId, dislikedNames)); setLoading(false); setChecked({}); }, 500);
+    setWeeklyPlan(null);
+    setShoppingScope("daily");
+    setTimeout(() => { setDailyPlan(generateDailyPlan(goalId, dislikedNames)); setLoading(false); setChecked({}); setTab("meal"); }, 500);
   }
 
   function handleAddExtra(mealType, extra) {
@@ -783,7 +853,7 @@ export default function App() {
       const p = generateDailyPlan(goalId, dislikedNames, allUsed);
       plans.push(p); allUsed.push(p.breakfast.name, p.lunch.name, p.dinner.name); setWeekProgress(i + 1);
     }
-    setWeeklyPlan(plans); setWeekDay(0); setWeekLoading(false); setTab("weekly");
+    setWeeklyPlan(plans); setWeekDay(0); setWeekLoading(false); setTab("weekly"); setShoppingScope("weekly");
   }
 
   const MEAL_TYPES = [["breakfast","🌅"], ["lunch","☀️"], ["dinner","🌙"], ["snack","🍌"]];
@@ -800,7 +870,7 @@ export default function App() {
             <div style={{ width:32, height:32, borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", background:`linear-gradient(135deg,${COLOR.accent},#e8913a)`, fontSize:16 }}>🍙</div>
             <div>
               <div style={{ fontSize:15, fontWeight:900, color:COLOR.text }}>スポごはん</div>
-              <div style={{ fontSize:9, color:COLOR.textSub }}>v0.9.0</div>
+              <div style={{ fontSize:9, color:COLOR.textSub }}>v0.10.0</div>
             </div>
           </div>
           <div style={{ display:"flex", gap:5 }}>
@@ -846,11 +916,21 @@ export default function App() {
             </div>
 
             {needs && (
-              <div style={{ background:COLOR.greenLight, borderRadius:12, padding:"10px 14px", marginBottom:20, border:`1px solid ${COLOR.green}20` }}>
+              <div style={{ background:COLOR.greenLight, borderRadius:12, padding:"10px 14px", marginBottom:10, border:`1px solid ${COLOR.green}20` }}>
                 <div style={{ fontSize:12, color:COLOR.green, fontWeight:700 }}>📊 推定1日</div>
                 <div style={{ display:"flex", gap:14 }}>
                   <span style={{ fontSize:18, fontWeight:900, color:COLOR.green }}>{needs.cal}kcal</span>
                   <span style={{ fontSize:13, fontWeight:700, color:COLOR.green }}>P {needs.protein}g</span>
+                </div>
+              </div>
+            )}
+            {needs && (
+              <div style={{ padding:"8px 12px", marginBottom:20, borderRadius:8, background:COLOR.warm, border:`1px solid ${COLOR.border}` }}>
+                <div style={{ fontSize:11, color:COLOR.textSub, lineHeight:1.7 }}>
+                  💡 この数値は選択した年齢・競技の<span style={{ fontWeight:700 }}>男女平均</span>の目安です。男の子は+10%、女の子は−10%を目安に調整してください。
+                </div>
+                <div style={{ fontSize:11, color:COLOR.textSub, lineHeight:1.7, marginTop:2 }}>
+                  👨‍👩‍👧‍👦 買い物リストの「何人分？」は<span style={{ fontWeight:700 }}>この基準の1人分</span>です。大人の分は少し減らしてお使いください。
                 </div>
               </div>
             )}
@@ -934,6 +1014,20 @@ export default function App() {
               </div>
             )}
 
+            {/* 給食あり/なしトグル */}
+            <div onClick={() => setHasSchoolLunch(!hasSchoolLunch)} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10, padding:"10px 14px", borderRadius:10, background: hasSchoolLunch ? "#e3f2fd" : COLOR.card, border:`1px solid ${hasSchoolLunch ? "#90caf9" : COLOR.border}`, cursor:"pointer", transition:"all .2s" }}>
+              <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                <span style={{ fontSize:18 }}>🏫</span>
+                <div>
+                  <div style={{ fontSize:13, fontWeight:700, color:COLOR.text }}>今日は給食あり</div>
+                  <div style={{ fontSize:11, color:COLOR.textSub }}>{hasSchoolLunch ? "昼食をスキップ中" : "ONにすると昼食を省きます"}</div>
+                </div>
+              </div>
+              <div style={{ width:44, height:24, borderRadius:12, background: hasSchoolLunch ? "#42a5f5" : "#ccc", position:"relative", transition:"background .2s" }}>
+                <div style={{ width:20, height:20, borderRadius:10, background:"#fff", position:"absolute", top:2, left: hasSchoolLunch ? 22 : 2, transition:"left .2s", boxShadow:"0 1px 3px rgba(0,0,0,.2)" }} />
+              </div>
+            </div>
+
             {/* タブ */}
             <div style={{ display:"flex", gap:3, marginBottom:12, background:"#e5e2dc", borderRadius:10, padding:3 }}>
               {[{ id:"meal", l:"🍽 今日" }, { id:"list", l:"🛒 買物" }, { id:"weekly", l:"📅 週間" }].map(t => (
@@ -946,17 +1040,31 @@ export default function App() {
               <div>
                 {/* DEC-006: 栄養バー（無料=カロリーのみ、P/C/Fロック） */}
                 <div style={{ background:COLOR.card, borderRadius:14, padding:14, marginBottom:12, border:`1px solid ${COLOR.border}` }}>
-                  <div style={{ fontSize:13, fontWeight:800, color:COLOR.text, marginBottom:10 }}>📊 栄養バランス</div>
-                  <NutritionBar label="エネルギー" current={sumNutrition(dailyPlan).cal} target={needs?.cal || 2000} color={COLOR.accent} unit="kcal" locked={false} />
-                  <NutritionBar label="タンパク質" current={sumNutrition(dailyPlan).p}   target={needs?.protein || 60} color="#c4652e" unit="g" locked={!isPremium} />
-                  <NutritionBar label="炭水化物"   current={sumNutrition(dailyPlan).c}   target={Math.round((needs?.cal || 2000) * .55 / 4)} color={COLOR.green} unit="g" locked={!isPremium} />
-                  <NutritionBar label="脂質"       current={sumNutrition(dailyPlan).f}   target={Math.round((needs?.cal || 2000) * .25 / 9)} color={COLOR.blue} unit="g" locked={!isPremium} />
+                  <div style={{ display:"flex", alignItems:"baseline", justifyContent:"space-between", marginBottom:10 }}>
+                    <div style={{ fontSize:13, fontWeight:800, color:COLOR.text }}>📊 栄養バランス</div>
+                    <div style={{ fontSize:10, color:COLOR.textSub, fontWeight:600 }}>{hasSchoolLunch ? "朝・夕・補食の合計値（昼は給食）" : "朝・昼・夕・補食の合計値"}</div>
+                  </div>
+                  {(() => { const skip = hasSchoolLunch ? ["lunch"] : []; const n = sumNutrition(dailyPlan, skip); return (<>
+                  <NutritionBar label="エネルギー（kcal）" current={n.cal} target={needs?.cal || 2000} color={COLOR.accent} unit="kcal" locked={false} />
+                  <NutritionBar label="タンパク質（P）" current={n.p}   target={needs?.protein || 60} color="#c4652e" unit="g" locked={!isPremium} />
+                  <NutritionBar label="炭水化物（C）"   current={n.c}   target={Math.round((needs?.cal || 2000) * .55 / 4)} color={COLOR.green} unit="g" locked={!isPremium} />
+                  <NutritionBar label="脂質（F）"       current={n.f}   target={Math.round((needs?.cal || 2000) * .25 / 9)} color={COLOR.blue} unit="g" locked={!isPremium} />
+                  </>); })()}
                 </div>
                 {isPremium && <div style={{ padding:"8px 12px", marginBottom:12, borderRadius:10, background:COLOR.accent+"08", fontSize:12, color:COLOR.accent, fontWeight:600 }}>✨ タップ → レシピ即表示＆副菜提案</div>}
                 <div style={{ display:"flex", flexDirection:"column", gap:10, marginBottom:12 }}>
-                  {MEAL_TYPES.map(([k, e]) => (
-                    <MealCard key={k} mealType={k} meal={dailyPlan[k]} emoji={e} isPremium={isPremium} dislikedNames={dislikedNames} onAddExtra={handleAddExtra} onTrial={activateTrial} />
-                  ))}
+                  {MEAL_TYPES.map(([k, e]) => {
+                    if (k === "lunch" && hasSchoolLunch) return (
+                      <div key={k} style={{ background:COLOR.card, borderRadius:14, padding:"14px 16px", border:`1px solid ${COLOR.border}`, display:"flex", alignItems:"center", gap:10 }}>
+                        <span style={{ fontSize:22 }}>🏫</span>
+                        <div>
+                          <div style={{ fontSize:13, fontWeight:700, color:COLOR.text }}>昼食：給食</div>
+                          <div style={{ fontSize:11, color:COLOR.textSub }}>今日は給食の日です</div>
+                        </div>
+                      </div>
+                    );
+                    return <MealCard key={k} mealType={k} meal={dailyPlan[k]} emoji={e} isPremium={isPremium} dislikedNames={dislikedNames} onAddExtra={handleAddExtra} onTrial={activateTrial} />;
+                  })}
                 </div>
                 <button onClick={handleRegenerate} disabled={loading} style={{ width:"100%", padding:"12px", borderRadius:12, border:`1.5px solid ${COLOR.border}`, background:COLOR.card, fontSize:14, fontWeight:700, cursor:"pointer", fontFamily:FONT, color:COLOR.text }}>
                   {loading ? "🔄 生成中..." : "🔄 別の献立にする"}
@@ -968,7 +1076,31 @@ export default function App() {
             {tab === "list" && (
               <PremiumGate isPremium={isPremium}>
                 <div style={{ background:COLOR.card, borderRadius:14, padding:16, border:`1px solid ${COLOR.green}20` }}>
-                  <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:14, padding:"10px 12px", borderRadius:12, background:COLOR.greenLight }}>
+                  {/* 買い物リストの対象範囲切り替え */}
+                  {weeklyPlan && dailyPlan && (
+                    <div style={{ display:"flex", gap:3, marginBottom:10, background:"#e5e2dc", borderRadius:8, padding:3 }}>
+                      <button onClick={() => setShoppingScope("daily")} style={{ flex:1, padding:"7px 4px", border:"none", borderRadius:6, fontSize:12, fontWeight: shoppingScope === "daily" ? 700 : 500, fontFamily:FONT, cursor:"pointer", background: shoppingScope === "daily" ? "#fff" : "transparent", color: shoppingScope === "daily" ? COLOR.text : COLOR.textSub }}>🍽 今日の1日分</button>
+                      <button onClick={() => setShoppingScope("weekly")} style={{ flex:1, padding:"7px 4px", border:"none", borderRadius:6, fontSize:12, fontWeight: shoppingScope === "weekly" ? 700 : 500, fontFamily:FONT, cursor:"pointer", background: shoppingScope === "weekly" ? "#fff" : "transparent", color: shoppingScope === "weekly" ? COLOR.text : COLOR.textSub }}>📅 1週間分</button>
+                    </div>
+                  )}
+                  {/* 対象範囲ラベル（切り替えがない場合） */}
+                  {!(weeklyPlan && dailyPlan) && (
+                    <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10, padding:"8px 12px", borderRadius:8, background: weeklyPlan ? "#e3f2fd" : COLOR.accentLight }}>
+                      <span style={{ fontSize:16 }}>{weeklyPlan ? "📅" : "🍽"}</span>
+                      <div style={{ flex:1 }}>
+                        <div style={{ fontSize:13, fontWeight:800, color: weeklyPlan ? "#1565c0" : COLOR.accent }}>{weeklyPlan ? "1週間分（7日間）" : "今日の1日分"}</div>
+                        <div style={{ fontSize:11, color: weeklyPlan ? "#42a5f5" : COLOR.textSub }}>{weeklyPlan ? "週間献立から自動計算" : "今日の献立から自動計算"}</div>
+                      </div>
+                    </div>
+                  )}
+                  {/* 給食除外バッジ */}
+                  {hasSchoolLunch && (
+                    <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10, padding:"8px 12px", borderRadius:8, background:"#fff3e0", border:"1px solid #ffe0b2" }}>
+                      <span style={{ fontSize:16 }}>🏫</span>
+                      <div style={{ fontSize:12, fontWeight:700, color:"#e65100" }}>給食あり → 昼食の材料を除外中</div>
+                    </div>
+                  )}
+                  <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:8, padding:"10px 12px", borderRadius:12, background:COLOR.greenLight }}>
                     <div style={{ fontSize:13, fontWeight:800, color:COLOR.green }}>👨‍👩‍👧‍👦 何人分？</div>
                     <div style={{ display:"flex", alignItems:"center", gap:6 }}>
                       <button onClick={() => setServings(Math.max(1, servings - 1))} style={{ width:30, height:30, borderRadius:8, border:`1px solid ${COLOR.green}40`, background:"#fff", fontSize:16, cursor:"pointer", color:COLOR.green, fontWeight:700 }}>−</button>
@@ -977,7 +1109,16 @@ export default function App() {
                       <span style={{ fontSize:12, color:COLOR.green, fontWeight:700 }}>人分</span>
                     </div>
                   </div>
-                  {Object.entries(buildShoppingList(weeklyPlan || dailyPlan, servings)).map(([cat, items]) =>
+                  {/* ②③④ 人数の補足説明 — 奥さんレビュー対応 */}
+                  <div style={{ padding:"8px 12px", marginBottom:12, borderRadius:8, background:COLOR.warm, border:`1px solid ${COLOR.border}` }}>
+                    <div style={{ fontSize:11, color:COLOR.textSub, lineHeight:1.7 }}>
+                      📌 <span style={{ fontWeight:700 }}>1人分 = {sportObj?.name || "選択した競技"}・{ageObj?.label || "選択した年齢"}のお子さん基準</span>の量です
+                    </div>
+                    <div style={{ fontSize:11, color:COLOR.textSub, lineHeight:1.7, marginTop:2 }}>
+                      💡 大人の分は<span style={{ fontWeight:700 }}>少し減らして</span>、スポーツをしていないお子さんは<span style={{ fontWeight:700 }}>7〜8割</span>を目安に調整してください
+                    </div>
+                  </div>
+                  {Object.entries(buildShoppingList(shoppingScope === "weekly" && weeklyPlan ? weeklyPlan : dailyPlan, servings, hasSchoolLunch ? ["lunch"] : [])).map(([cat, items]) =>
                     items.length > 0 && (
                       <div key={cat} style={{ marginBottom:14 }}>
                         <div style={{ fontSize:12, fontWeight:700, color:COLOR.textSub, marginBottom:4, paddingBottom:3, borderBottom:`1px solid ${COLOR.border}` }}>{cat}</div>
@@ -987,7 +1128,7 @@ export default function App() {
                             <label key={j} style={{ display:"flex", alignItems:"center", gap:8, padding:"7px 10px", borderRadius:8, cursor:"pointer", background: checked[key] ? COLOR.greenLight : "transparent" }}>
                               <input type="checkbox" checked={!!checked[key]} onChange={() => setChecked(p => ({ ...p, [key]: !p[key] }))} style={{ width:16, height:16, accentColor:COLOR.green }} />
                               <span style={{ flex:1, fontSize:13, color: checked[key] ? COLOR.textSub : COLOR.text, textDecoration: checked[key] ? "line-through" : "none" }}>{it.n}</span>
-                              <span style={{ fontSize:13, fontWeight:700, color: checked[key] ? COLOR.textSub : COLOR.accent, textDecoration: checked[key] ? "line-through" : "none" }}>{formatQty(it.q)} {it.u}</span>
+                              <span style={{ fontSize:13, fontWeight:700, color: checked[key] ? COLOR.textSub : COLOR.accent, textDecoration: checked[key] ? "line-through" : "none" }}>{(() => { const s = toShoppingUnit(it.n, it.q, it.u); return `${formatQty(s.q)} ${s.u}`; })()}</span>
                             </label>
                           );
                         })}
@@ -1020,14 +1161,25 @@ export default function App() {
                         ))}
                       </div>
                       <div style={{ background:COLOR.card, borderRadius:14, padding:14, marginBottom:12, border:`1px solid ${COLOR.border}` }}>
-                        <div style={{ fontSize:13, fontWeight:800, color:COLOR.text, marginBottom:10 }}>📊 {DAY_LABELS[weekDay]}曜日</div>
-                        <NutritionBar label="エネルギー" current={sumNutrition(weeklyPlan[weekDay]).cal} target={needs?.cal || 2000} color={COLOR.accent} unit="kcal" locked={false} />
-                        <NutritionBar label="タンパク質" current={sumNutrition(weeklyPlan[weekDay]).p}   target={needs?.protein || 60} color="#c4652e" unit="g" locked={false} />
+                        <div style={{ fontSize:13, fontWeight:800, color:COLOR.text, marginBottom:10 }}>📊 {DAY_LABELS[weekDay]}曜日{hasSchoolLunch ? "（昼は給食）" : ""}</div>
+                        {(() => { const skip = hasSchoolLunch ? ["lunch"] : []; const n = sumNutrition(weeklyPlan[weekDay], skip); return (<>
+                        <NutritionBar label="エネルギー（kcal）" current={n.cal} target={needs?.cal || 2000} color={COLOR.accent} unit="kcal" locked={false} />
+                        <NutritionBar label="タンパク質（P）" current={n.p}   target={needs?.protein || 60} color="#c4652e" unit="g" locked={false} />
+                        </>); })()}
                       </div>
                       <div style={{ display:"flex", flexDirection:"column", gap:10, marginBottom:12 }}>
-                        {MEAL_TYPES.map(([k, e]) => (
-                          <MealCard key={weekDay + k} mealType={k} meal={weeklyPlan[weekDay][k]} emoji={e} isPremium={isPremium} dislikedNames={dislikedNames} onAddExtra={handleAddExtra} onTrial={activateTrial} />
-                        ))}
+                        {MEAL_TYPES.map(([k, e]) => {
+                          if (k === "lunch" && hasSchoolLunch) return (
+                            <div key={weekDay + k} style={{ background:COLOR.card, borderRadius:14, padding:"14px 16px", border:`1px solid ${COLOR.border}`, display:"flex", alignItems:"center", gap:10 }}>
+                              <span style={{ fontSize:22 }}>🏫</span>
+                              <div>
+                                <div style={{ fontSize:13, fontWeight:700, color:COLOR.text }}>昼食：給食</div>
+                                <div style={{ fontSize:11, color:COLOR.textSub }}>給食の日です</div>
+                              </div>
+                            </div>
+                          );
+                          return <MealCard key={weekDay + k} mealType={k} meal={weeklyPlan[weekDay][k]} emoji={e} isPremium={isPremium} dislikedNames={dislikedNames} onAddExtra={handleAddExtra} onTrial={activateTrial} />;
+                        })}
                       </div>
                       <div style={{ display:"flex", gap:8 }}>
                         <button onClick={() => { const n = [...weeklyPlan]; n[weekDay] = generateDailyPlan(goalId, dislikedNames); setWeeklyPlan(n); }} style={{ flex:1, padding:"10px", borderRadius:10, border:`1.5px solid ${COLOR.border}`, background:COLOR.card, fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:FONT, color:COLOR.text }}>🔄 {DAY_LABELS[weekDay]}曜だけ</button>
