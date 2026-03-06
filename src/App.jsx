@@ -36,10 +36,10 @@ const AGES = [
 ];
 
 const GOALS = [
-  { id: "stamina",  name: "持久力UP",   emoji: "💪", focus: "炭水化物多め"          },
-  { id: "growth",   name: "体を大きく", emoji: "📏", focus: "タンパク質+カルシウム" },
-  { id: "recovery", name: "疲労回復",   emoji: "🔋", focus: "ビタミンB群+鉄分"     },
-  { id: "prematch", name: "試合前",     emoji: "🏆", focus: "高糖質・低脂肪"       },
+  { id: "stamina",  name: "持久力UP",   emoji: "💪", focus: "炭水化物多め",          pRatio: 0.15, cRatio: 0.60, fRatio: 0.25, barLabel: "💪 持久力UP：炭水化物多めの配分" },
+  { id: "growth",   name: "体を大きく", emoji: "📏", focus: "タンパク質+カルシウム", pRatio: 0.20, cRatio: 0.55, fRatio: 0.25, barLabel: "📏 体づくり：タンパク質を重視した配分" },
+  { id: "recovery", name: "疲労回復",   emoji: "🔋", focus: "ビタミンB群+鉄分",     pRatio: 0.18, cRatio: 0.55, fRatio: 0.27, barLabel: "🔋 疲労回復：バランス重視の配分" },
+  { id: "prematch", name: "試合前",     emoji: "🏆", focus: "高糖質・低脂肪",       pRatio: 0.13, cRatio: 0.65, fRatio: 0.22, barLabel: "🏆 試合前：高糖質・低脂肪の配分" },
 ];
 
 const DISLIKE_LIST = [
@@ -437,10 +437,14 @@ function adjustRiceForTarget(plan, targetCal) {
   const diff = targetCal - currentCal;
 
   // 差が小さければ（±100kcal以内）調整不要
-  if (Math.abs(diff) < 100) return plan;
+  if (Math.abs(diff) < 100) {
+    const pct = Math.round(currentCal / targetCal * 100);
+    return { ...plan, _riceAdjust: { adjusted: false, pct, targetCal, details: [] } };
+  }
 
   // 朝・昼・夕の3食からご飯を持つ食事を特定
   const mealKeys = ["breakfast","lunch","dinner"];
+  const MEAL_JP = { breakfast:"朝", lunch:"昼", dinner:"夕" };
   const riceInfo = mealKeys.map(k => {
     const meal = plan[k];
     if (!meal) return null;
@@ -449,17 +453,23 @@ function adjustRiceForTarget(plan, targetCal) {
     return { key: k, item: riceItem, currentG: riceItem.q };
   }).filter(Boolean);
 
-  if (!riceInfo.length) return plan; // ご飯がなければ調整不可
+  if (!riceInfo.length) {
+    const pct = Math.round(currentCal / targetCal * 100);
+    return { ...plan, _riceAdjust: { adjusted: false, pct, targetCal, details: [] } };
+  }
 
   // 差分をご飯のグラム数に変換し、ご飯のある食事に均等配分
   const extraGPerMeal = Math.round(diff / RICE_PER_100G.cal * 100 / riceInfo.length);
 
   const adjusted = { ...plan };
+  const details = [];
   riceInfo.forEach(ri => {
     const meal = { ...adjusted[ri.key] };
     const newG = Math.min(400, Math.max(100, ri.currentG + extraGPerMeal)); // 最低100g、最大400g
     const deltaG = newG - ri.currentG;
     const ratio = deltaG / 100;
+
+    details.push({ meal: MEAL_JP[ri.key], beforeG: ri.currentG, afterG: newG });
 
     // 栄養値を更新
     meal.cal = Math.round(meal.cal + RICE_PER_100G.cal * ratio);
@@ -474,6 +484,11 @@ function adjustRiceForTarget(plan, targetCal) {
     adjusted[ri.key] = meal;
   });
 
+  // 調整後の合計カロリーで充足率を再計算
+  const adjustedCal = ["breakfast","lunch","dinner","snack"].reduce((sum, k) => sum + (adjusted[k]?.cal || 0), 0);
+  const pct = Math.round(adjustedCal / targetCal * 100);
+
+  adjusted._riceAdjust = { adjusted: true, pct, targetCal, details };
   return adjusted;
 }
 
@@ -1108,19 +1123,35 @@ export default function App() {
               <div>
                 {/* DEC-006: 栄養バー（無料=カロリーのみ、P/C/Fロック） */}
                 <div style={{ background:COLOR.card, borderRadius:14, padding:14, marginBottom:12, border:`1px solid ${COLOR.border}` }}>
-                  <div style={{ display:"flex", alignItems:"baseline", justifyContent:"space-between", marginBottom:10 }}>
+                  <div style={{ display:"flex", alignItems:"baseline", justifyContent:"space-between", marginBottom:4 }}>
                     <div style={{ fontSize:15, fontWeight:800, color:COLOR.text }}>📊 栄養バランス</div>
                     <div style={{ fontSize:12, color:COLOR.textSub, fontWeight:600 }}>{hasSchoolLunch ? "朝・夕・補食の合計値（昼は給食）" : "朝・昼・夕・補食の合計値"}</div>
                   </div>
-                  {(() => { const skip = hasSchoolLunch ? ["lunch"] : []; const n = sumNutrition(dailyPlan, skip); return (<>
-                  <NutritionBar label="エネルギー（kcal）" current={n.cal} target={needs?.cal || 2000} color={COLOR.accent} unit="kcal" locked={false} hint="1日に燃やす燃料の総量。足りないと練習中にバテやすくなります" />
-                  <NutritionBar label="タンパク質（P）" current={n.p}   target={needs?.protein || 60} color="#c4652e" unit="g" locked={!isPremium} hint="筋肉・骨・血液の材料。成長期のアスリートは大人より多く必要です" />
-                  <NutritionBar label="炭水化物（C）"   current={n.c}   target={Math.round((needs?.cal || 2000) * .55 / 4)} color={COLOR.green} unit="g" locked={!isPremium} hint="練習中のガソリン。不足すると集中力が落ち、ケガのリスクも上がります" />
-                  <NutritionBar label="脂質（F）"       current={n.f}   target={Math.round((needs?.cal || 2000) * .25 / 9)} color={COLOR.blue} unit="g" locked={!isPremium} hint="ホルモンや細胞膜の材料。摂りすぎると体が重くなり、少なすぎると成長に影響します" />
+                  <div style={{ fontSize:12, color:COLOR.accent, fontWeight:700, marginBottom:10, padding:"4px 8px", borderRadius:6, background:COLOR.accentLight, display:"inline-block" }}>{goalObj?.barLabel}</div>
+                  {(() => { const skip = hasSchoolLunch ? ["lunch"] : []; const n = sumNutrition(dailyPlan, skip); const cal = needs?.cal || 2000; return (<>
+                  <NutritionBar label="エネルギー（kcal）" current={n.cal} target={cal} color={COLOR.accent} unit="kcal" locked={false} hint="1日に燃やす燃料の総量。足りないと練習中にバテやすくなります" />
+                  <NutritionBar label="タンパク質（P）" current={n.p}   target={Math.round(cal * (goalObj?.pRatio || 0.15) / 4)} color="#c4652e" unit="g" locked={!isPremium} hint="筋肉・骨・血液の材料。成長期のアスリートは大人より多く必要です" />
+                  <NutritionBar label="炭水化物（C）"   current={n.c}   target={Math.round(cal * (goalObj?.cRatio || 0.55) / 4)} color={COLOR.green} unit="g" locked={!isPremium} hint="練習中のガソリン。不足すると集中力が落ち、ケガのリスクも上がります" />
+                  <NutritionBar label="脂質（F）"       current={n.f}   target={Math.round(cal * (goalObj?.fRatio || 0.25) / 9)} color={COLOR.blue} unit="g" locked={!isPremium} hint="ホルモンや細胞膜の材料。摂りすぎると体が重くなり、少なすぎると成長に影響します" />
                   </>); })()}
-                  <div style={{ padding:"6px 10px", borderRadius:6, background:COLOR.warm, fontSize:12, color:COLOR.textSub, lineHeight:1.6 }}>
-                    🍚 目標カロリーに近づくよう、ご飯の量を自動で調整しています。お子さんの食べ具合に合わせて加減してください。
-                  </div>
+                  {/* ご飯量調整の結果表示 */}
+                  {dailyPlan?._riceAdjust && (
+                    <div style={{ padding:"8px 12px", borderRadius:8, background: dailyPlan._riceAdjust.pct >= 90 ? COLOR.greenLight : "#fff3e0", border:`1px solid ${dailyPlan._riceAdjust.pct >= 90 ? COLOR.green+"30" : "#ffe0b2"}`, fontSize:13, lineHeight:1.7 }}>
+                      <div style={{ fontWeight:700, color: dailyPlan._riceAdjust.pct >= 90 ? COLOR.green : "#e65100", marginBottom:2 }}>
+                        🍚 目標 {dailyPlan._riceAdjust.targetCal}kcal に対して <span style={{ fontSize:16, fontWeight:900 }}>{dailyPlan._riceAdjust.pct}%</span> カバー
+                      </div>
+                      {dailyPlan._riceAdjust.adjusted && dailyPlan._riceAdjust.details.length > 0 && (
+                        <div style={{ color:COLOR.textSub, fontSize:12 }}>
+                          ご飯量を調整済み：{dailyPlan._riceAdjust.details.map(d => `${d.meal} ${d.beforeG}g→${d.afterG}g`).join("、")}
+                        </div>
+                      )}
+                      {dailyPlan._riceAdjust.pct < 100 && (
+                        <div style={{ color:COLOR.textSub, fontSize:12, marginTop:2 }}>
+                          💡 残りはおやつ・果物・牛乳などで補えます
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
                 {isPremium && <div style={{ padding:"8px 12px", marginBottom:12, borderRadius:10, background:COLOR.accent+"08", fontSize:14, color:COLOR.accent, fontWeight:600 }}>✨ タップ → レシピ即表示＆副菜提案</div>}
                 <div style={{ display:"flex", flexDirection:"column", gap:10, marginBottom:12 }}>
@@ -1232,13 +1263,34 @@ export default function App() {
                         ))}
                       </div>
                       <div style={{ background:COLOR.card, borderRadius:14, padding:14, marginBottom:12, border:`1px solid ${COLOR.border}` }}>
-                        <div style={{ fontSize:15, fontWeight:800, color:COLOR.text, marginBottom:10 }}>📊 {DAY_LABELS[weekDay]}曜日{hasSchoolLunch ? "（昼は給食）" : ""}</div>
-                        {(() => { const skip = hasSchoolLunch ? ["lunch"] : []; const n = sumNutrition(weeklyPlan[weekDay], skip); return (<>
-                        <NutritionBar label="エネルギー（kcal）" current={n.cal} target={needs?.cal || 2000} color={COLOR.accent} unit="kcal" locked={false} hint="1日に燃やす燃料の総量。足りないと練習中にバテやすくなります" />
-                        <NutritionBar label="タンパク質（P）" current={n.p}   target={needs?.protein || 60} color="#c4652e" unit="g" locked={false} hint="筋肉・骨・血液の材料。成長期のアスリートは大人より多く必要です" />
-                        <NutritionBar label="炭水化物（C）"   current={n.c}   target={Math.round((needs?.cal || 2000) * .55 / 4)} color={COLOR.green} unit="g" locked={false} hint="練習中のガソリン。不足すると集中力が落ち、ケガのリスクも上がります" />
-                        <NutritionBar label="脂質（F）"       current={n.f}   target={Math.round((needs?.cal || 2000) * .25 / 9)} color={COLOR.blue} unit="g" locked={false} hint="ホルモンや細胞膜の材料。摂りすぎると体が重くなり、少なすぎると成長に影響します" />
+                        <div style={{ display:"flex", alignItems:"baseline", justifyContent:"space-between", marginBottom:4 }}>
+                          <div style={{ fontSize:15, fontWeight:800, color:COLOR.text }}>📊 {DAY_LABELS[weekDay]}曜日{hasSchoolLunch ? "（昼は給食）" : ""}</div>
+                        </div>
+                        <div style={{ fontSize:12, color:COLOR.accent, fontWeight:700, marginBottom:10, padding:"4px 8px", borderRadius:6, background:COLOR.accentLight, display:"inline-block" }}>{goalObj?.barLabel}</div>
+                        {(() => { const skip = hasSchoolLunch ? ["lunch"] : []; const n = sumNutrition(weeklyPlan[weekDay], skip); const cal = needs?.cal || 2000; return (<>
+                        <NutritionBar label="エネルギー（kcal）" current={n.cal} target={cal} color={COLOR.accent} unit="kcal" locked={false} hint="1日に燃やす燃料の総量。足りないと練習中にバテやすくなります" />
+                        <NutritionBar label="タンパク質（P）" current={n.p}   target={Math.round(cal * (goalObj?.pRatio || 0.15) / 4)} color="#c4652e" unit="g" locked={false} hint="筋肉・骨・血液の材料。成長期のアスリートは大人より多く必要です" />
+                        <NutritionBar label="炭水化物（C）"   current={n.c}   target={Math.round(cal * (goalObj?.cRatio || 0.55) / 4)} color={COLOR.green} unit="g" locked={false} hint="練習中のガソリン。不足すると集中力が落ち、ケガのリスクも上がります" />
+                        <NutritionBar label="脂質（F）"       current={n.f}   target={Math.round(cal * (goalObj?.fRatio || 0.25) / 9)} color={COLOR.blue} unit="g" locked={false} hint="ホルモンや細胞膜の材料。摂りすぎると体が重くなり、少なすぎると成長に影響します" />
                         </>); })()}
+                        {/* 週間: ご飯量調整の結果表示 */}
+                        {weeklyPlan[weekDay]?._riceAdjust && (
+                          <div style={{ padding:"8px 12px", borderRadius:8, background: weeklyPlan[weekDay]._riceAdjust.pct >= 90 ? COLOR.greenLight : "#fff3e0", border:`1px solid ${weeklyPlan[weekDay]._riceAdjust.pct >= 90 ? COLOR.green+"30" : "#ffe0b2"}`, fontSize:13, lineHeight:1.7 }}>
+                            <div style={{ fontWeight:700, color: weeklyPlan[weekDay]._riceAdjust.pct >= 90 ? COLOR.green : "#e65100", marginBottom:2 }}>
+                              🍚 目標 {weeklyPlan[weekDay]._riceAdjust.targetCal}kcal に対して <span style={{ fontSize:16, fontWeight:900 }}>{weeklyPlan[weekDay]._riceAdjust.pct}%</span> カバー
+                            </div>
+                            {weeklyPlan[weekDay]._riceAdjust.adjusted && weeklyPlan[weekDay]._riceAdjust.details.length > 0 && (
+                              <div style={{ color:COLOR.textSub, fontSize:12 }}>
+                                ご飯量を調整済み：{weeklyPlan[weekDay]._riceAdjust.details.map(d => `${d.meal} ${d.beforeG}g→${d.afterG}g`).join("、")}
+                              </div>
+                            )}
+                            {weeklyPlan[weekDay]._riceAdjust.pct < 100 && (
+                              <div style={{ color:COLOR.textSub, fontSize:12, marginTop:2 }}>
+                                💡 残りはおやつ・果物・牛乳などで補えます
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                       <div style={{ display:"flex", flexDirection:"column", gap:10, marginBottom:12 }}>
                         {MEAL_TYPES.map(([k, e]) => {
