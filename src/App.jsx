@@ -411,13 +411,70 @@ function pickMeal(meals, dislikedNames, usedNames = []) {
   return filtered[0 | Math.random() * filtered.length];
 }
 
-function generateDailyPlan(goalId, dislikedNames, usedNames = []) {
+function generateDailyPlan(goalId, dislikedNames, usedNames = [], targetCal = null) {
   const db = MEAL_DB[goalId] || MEAL_DB.stamina;
   const b = pickMeal(db.breakfast, dislikedNames, usedNames);
   const l = pickMeal(db.lunch, dislikedNames, [...usedNames, b.name]);
   const d = pickMeal(db.dinner, dislikedNames, [...usedNames, b.name, l.name]);
   const s = pickMeal(db.snack, dislikedNames, [...usedNames, b.name, l.name, d.name]);
+
+  // ご飯量自動調整: 目標カロリーに近づくよう主食量をスケーリング
+  if (targetCal) {
+    const plan = { breakfast: b, lunch: l, dinner: d, snack: s };
+    return adjustRiceForTarget(plan, targetCal);
+  }
   return { breakfast: b, lunch: l, dinner: d, snack: s };
+}
+
+/** ご飯量自動調整 — 目標カロリーとの差分をご飯(主食)の増減で吸収
+ *  ご飯100gあたり: 168kcal, P2.5g, C37.1g, F0.3g */
+const RICE_PER_100G = { cal: 168, p: 2.5, c: 37.1, f: 0.3 };
+const RICE_NAMES = ["ご飯","ごはん"];
+
+function adjustRiceForTarget(plan, targetCal) {
+  // 現在の合計カロリー
+  const currentCal = ["breakfast","lunch","dinner","snack"].reduce((sum, k) => sum + (plan[k]?.cal || 0), 0);
+  const diff = targetCal - currentCal;
+
+  // 差が小さければ（±100kcal以内）調整不要
+  if (Math.abs(diff) < 100) return plan;
+
+  // 朝・昼・夕の3食からご飯を持つ食事を特定
+  const mealKeys = ["breakfast","lunch","dinner"];
+  const riceInfo = mealKeys.map(k => {
+    const meal = plan[k];
+    if (!meal) return null;
+    const riceItem = meal.items.find(it => RICE_NAMES.some(rn => it.n.includes(rn)));
+    if (!riceItem) return null;
+    return { key: k, item: riceItem, currentG: riceItem.q };
+  }).filter(Boolean);
+
+  if (!riceInfo.length) return plan; // ご飯がなければ調整不可
+
+  // 差分をご飯のグラム数に変換し、ご飯のある食事に均等配分
+  const extraGPerMeal = Math.round(diff / RICE_PER_100G.cal * 100 / riceInfo.length);
+
+  const adjusted = { ...plan };
+  riceInfo.forEach(ri => {
+    const meal = { ...adjusted[ri.key] };
+    const newG = Math.min(400, Math.max(100, ri.currentG + extraGPerMeal)); // 最低100g、最大400g
+    const deltaG = newG - ri.currentG;
+    const ratio = deltaG / 100;
+
+    // 栄養値を更新
+    meal.cal = Math.round(meal.cal + RICE_PER_100G.cal * ratio);
+    meal.p   = Math.round(meal.p   + RICE_PER_100G.p * ratio);
+    meal.c   = Math.round(meal.c   + RICE_PER_100G.c * ratio);
+    meal.f   = Math.round(meal.f   + RICE_PER_100G.f * ratio);
+
+    // 材料リストのご飯量を更新
+    meal.items = meal.items.map(it =>
+      RICE_NAMES.some(rn => it.n.includes(rn)) ? { ...it, q: newG } : it
+    );
+    adjusted[ri.key] = meal;
+  });
+
+  return adjusted;
 }
 
 function getRecipe(name) {
@@ -554,26 +611,33 @@ function pickSideDish(meal, dislikedNames) {
 function TagBadge({ tag }) {
   const MAP = { "時短":{ bg:"#fff3e0", fg:"#e65100", icon:"⚡" }, "レンジ":{ bg:"#fce4ec", fg:"#c62828", icon:"📡" }, "炊飯器":{ bg:"#e8eaf6", fg:"#283593", icon:"🍚" }, "作り置き":{ bg:"#e0f2f1", fg:"#00695c", icon:"🧊" }, "冷凍OK":{ bg:"#e3f2fd", fg:"#1565c0", icon:"❄️" } };
   const s = MAP[tag] || { bg:"#f5f5f5", fg:"#666", icon:"🏷" };
-  return <span style={{ fontSize:12, padding:"3px 9px", borderRadius:6, background:s.bg, color:s.fg, fontWeight:700, display:"inline-flex", alignItems:"center", gap:3 }}>{s.icon} {tag}</span>;
+  return <span style={{ fontSize:14, padding:"3px 9px", borderRadius:6, background:s.bg, color:s.fg, fontWeight:700, display:"inline-flex", alignItems:"center", gap:3 }}>{s.icon} {tag}</span>;
 }
 
-/** 栄養バー — DEC-006: locked=true のときぼかし表示 */
-function NutritionBar({ label, current, target, color, unit, locked }) {
+/** 栄養バー — DEC-006: locked=true のときぼかし表示, v0.10: ヒント付き */
+function NutritionBar({ label, current, target, color, unit, locked, hint }) {
+  const [showHint, setShowHint] = useState(false);
   const pct = Math.min(current / target * 100, 100);
+  const hintBubble = showHint && hint ? (
+    <div style={{ margin:"4px 0 6px", padding:"8px 12px", borderRadius:8, background:"#fffde7", border:"1px solid #fff9c4", fontSize:14, color:"#5d4037", lineHeight:1.6, animation:"slideUp .2s" }}>
+      💡 {hint}
+      <span onClick={(e) => { e.stopPropagation(); setShowHint(false); }} style={{ marginLeft:8, fontSize:13, color:COLOR.textSub, cursor:"pointer" }}>✕</span>
+    </div>
+  ) : null;
   if (locked) {
     return (
       <div style={{ marginBottom:10, position:"relative" }}>
         <div style={{ filter:"blur(4px)", opacity:.4 }}>
           <div style={{ display:"flex", justifyContent:"space-between", marginBottom:3 }}>
-            <span style={{ fontSize:13, color:COLOR.textSub, fontWeight:600 }}>{label}</span>
-            <span style={{ fontSize:13, color:COLOR.textSub, fontWeight:700 }}>??{unit}/??{unit}</span>
+            <span style={{ fontSize:15, color:COLOR.textSub, fontWeight:600 }}>{label}</span>
+            <span style={{ fontSize:15, color:COLOR.textSub, fontWeight:700 }}>??{unit}/??{unit}</span>
           </div>
           <div style={{ height:7, borderRadius:4, background:COLOR.warm, overflow:"hidden" }}>
             <div style={{ width:"60%", height:"100%", borderRadius:4, background:color }} />
           </div>
         </div>
         <div style={{ position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
-          <span style={{ fontSize:11, color:COLOR.premium, fontWeight:700, background:"#fff", padding:"2px 10px", borderRadius:4 }}>🔒 プレミアム</span>
+          <span style={{ fontSize:13, color:COLOR.premium, fontWeight:700, background:"#fff", padding:"2px 10px", borderRadius:4 }}>🔒 プレミアム</span>
         </div>
       </div>
     );
@@ -581,9 +645,13 @@ function NutritionBar({ label, current, target, color, unit, locked }) {
   return (
     <div style={{ marginBottom:10 }}>
       <div style={{ display:"flex", justifyContent:"space-between", marginBottom:3 }}>
-        <span style={{ fontSize:13, color:COLOR.textSub, fontWeight:600 }}>{label}</span>
-        <span style={{ fontSize:13, color: current > target * 1.1 ? "#c44" : COLOR.text, fontWeight:700 }}>{current}{unit}/{target}{unit}</span>
+        <span style={{ fontSize:15, color:COLOR.textSub, fontWeight:600, display:"flex", alignItems:"center", gap:4 }}>
+          {label}
+          {hint && <span onClick={(e) => { e.stopPropagation(); setShowHint(!showHint); }} style={{ display:"inline-flex", alignItems:"center", justifyContent:"center", width:16, height:16, borderRadius:8, background: showHint ? "#fdd835" : COLOR.border, color: showHint ? "#5d4037" : COLOR.textSub, fontSize:12, fontWeight:800, cursor:"pointer", lineHeight:1 }}>?</span>}
+        </span>
+        <span style={{ fontSize:15, color: current > target * 1.1 ? "#c44" : COLOR.text, fontWeight:700 }}>{current}{unit}/{target}{unit}</span>
       </div>
+      {hintBubble}
       <div style={{ height:7, borderRadius:4, background:COLOR.warm, overflow:"hidden" }}>
         <div style={{ width:`${pct}%`, height:"100%", borderRadius:4, background: current > target * 1.1 ? "#c44" : color, transition:"width .6s" }} />
       </div>
@@ -598,7 +666,7 @@ function PremiumGate({ children, isPremium }) {
       <div style={{ filter:"blur(3px)", pointerEvents:"none", opacity:.5 }}>{children}</div>
       <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", borderRadius:16, background:"rgba(255,255,255,.75)" }}>
         <span style={{ fontSize:28, marginBottom:6 }}>🔒</span>
-        <span style={{ fontSize:14, fontWeight:800, color:COLOR.text }}>プレミアム限定</span>
+        <span style={{ fontSize:16, fontWeight:800, color:COLOR.text }}>プレミアム限定</span>
       </div>
     </div>
   );
@@ -607,7 +675,7 @@ function PremiumGate({ children, isPremium }) {
 /** PY-CTA: 共通の「無料で試す」ボタン */
 function TrialCTA({ onClick, label }) {
   return (
-    <button onClick={onClick} style={{ width:"100%", padding:"12px", borderRadius:10, border:"none", background:`linear-gradient(135deg,${COLOR.accent},#e8913a)`, color:"#fff", fontSize:14, fontWeight:800, cursor:"pointer", fontFamily:FONT }}>
+    <button onClick={onClick} style={{ width:"100%", padding:"12px", borderRadius:10, border:"none", background:`linear-gradient(135deg,${COLOR.accent},#e8913a)`, color:"#fff", fontSize:16, fontWeight:800, cursor:"pointer", fontFamily:FONT }}>
       {label || "14日間 無料で試す →"}
     </button>
   );
@@ -633,23 +701,23 @@ function MealCard({ mealType, meal, emoji, isPremium, dislikedNames, onAddExtra,
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:6 }}>
           <div style={{ display:"flex", alignItems:"center", gap:8 }}>
             <span style={{ fontSize:22 }}>{emoji}</span>
-            <span style={{ fontSize:11, fontWeight:800, color:COLORS[mealType], background:COLORS[mealType]+"12", padding:"3px 9px", borderRadius:5 }}>{LABELS[mealType]}</span>
+            <span style={{ fontSize:13, fontWeight:800, color:COLORS[mealType], background:COLORS[mealType]+"12", padding:"3px 9px", borderRadius:5 }}>{LABELS[mealType]}</span>
           </div>
           <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-            {meal.min > 0 && <span style={{ fontSize:12, fontWeight:700, color: meal.min <= 10 ? "#e65100" : COLOR.textSub }}>⏱{meal.min}分</span>}
+            {meal.min > 0 && <span style={{ fontSize:14, fontWeight:700, color: meal.min <= 10 ? "#e65100" : COLOR.textSub }}>⏱{meal.min}分</span>}
             <span style={{ fontSize:16, color:COLOR.textSub, transform: expanded ? "rotate(180deg)" : "none", transition:"transform .2s" }}>▾</span>
           </div>
         </div>
-        <p style={{ fontSize:15, fontWeight:700, color:COLOR.text, margin:"0 0 6px", lineHeight:1.5 }}>{meal.name}</p>
+        <p style={{ fontSize:17, fontWeight:700, color:COLOR.text, margin:"0 0 6px", lineHeight:1.5 }}>{meal.name}</p>
         {meal.tags.length > 0 && (
           <div style={{ display:"flex", gap:4, flexWrap:"wrap", marginBottom:8 }}>
             {meal.tags.map((t, i) => <TagBadge key={i} tag={t} />)}
           </div>
         )}
         <div style={{ display:"flex", gap:5, flexWrap:"wrap", alignItems:"center" }}>
-          <span style={{ fontSize:10, color:COLOR.textSub, fontWeight:600, marginRight:2 }}>1食分:</span>
+          <span style={{ fontSize:12, color:COLOR.textSub, fontWeight:600, marginRight:2 }}>1食分:</span>
           {[{ l:`${meal.cal}kcal`, c:"#e8913a" }, { l:`P${meal.p}g`, c:COLOR.accent }, { l:`C${meal.c}g`, c:COLOR.green }, { l:`F${meal.f}g`, c:COLOR.blue }].map((t, i) => (
-            <span key={i} style={{ fontSize:11, padding:"3px 8px", borderRadius:5, background:t.c+"10", color:t.c, fontWeight:700 }}>{t.l}</span>
+            <span key={i} style={{ fontSize:13, padding:"3px 8px", borderRadius:5, background:t.c+"10", color:t.c, fontWeight:700 }}>{t.l}</span>
           ))}
         </div>
       </div>
@@ -659,16 +727,16 @@ function MealCard({ mealType, meal, emoji, isPremium, dislikedNames, onAddExtra,
         <div style={{ padding:"0 16px 14px", borderTop:`1px solid ${COLOR.border}` }}>
           <div style={{ paddingTop:12 }}>
             {/* レシピタイトル（展開時に再表示） */}
-            <div style={{ fontSize:14, fontWeight:800, color:COLORS[mealType], marginBottom:10 }}>📝 {meal.name}</div>
+            <div style={{ fontSize:16, fontWeight:800, color:COLORS[mealType], marginBottom:10 }}>📝 {meal.name}</div>
 
             {recipe ? (
               <div>
                 {/* DEC-007: 材料リスト（無料でも全表示） */}
                 <div style={{ marginBottom:12, padding:"10px 12px", borderRadius:10, background:COLOR.warm }}>
-                  <div style={{ display:"flex", alignItems:"baseline", gap:6, marginBottom:6 }}><span style={{ fontSize:12, fontWeight:800, color:COLOR.textSub }}>🥄 材料（1人分）</span><span style={{ fontSize:11, color:COLOR.textSub, opacity:.7 }}>※買い物リストで人数分に調整</span></div>
+                  <div style={{ display:"flex", alignItems:"baseline", gap:6, marginBottom:6 }}><span style={{ fontSize:14, fontWeight:800, color:COLOR.textSub }}>🥄 材料（1人分）</span><span style={{ fontSize:13, color:COLOR.textSub, opacity:.7 }}>※買い物リストで人数分に調整</span></div>
                   <div style={{ display:"flex", flexWrap:"wrap", gap:4 }}>
                     {meal.items.map((item, i) => (
-                      <span key={i} style={{ fontSize:12, color:COLOR.text, background:COLOR.card, padding:"4px 9px", borderRadius:6, border:`1px solid ${COLOR.border}`, lineHeight:1.4 }}>
+                      <span key={i} style={{ fontSize:14, color:COLOR.text, background:COLOR.card, padding:"4px 9px", borderRadius:6, border:`1px solid ${COLOR.border}`, lineHeight:1.4 }}>
                         {item.n} <span style={{ fontWeight:700, color:COLOR.accent }}>{formatQty(item.q)}{item.u}</span>
                       </span>
                     ))}
@@ -676,55 +744,55 @@ function MealCard({ mealType, meal, emoji, isPremium, dislikedNames, onAddExtra,
                 </div>
 
                 {/* 作り方ラベル */}
-                <div style={{ fontSize:12, fontWeight:800, color:COLOR.textSub, marginBottom:8 }}>🔪 {meal.name}の作り方</div>
+                <div style={{ fontSize:14, fontWeight:800, color:COLOR.textSub, marginBottom:8 }}>🔪 {meal.name}の作り方</div>
 
                 {/* Step 1 は常に表示（無料チラ見せ） */}
                 <div style={{ display:"flex", gap:8, marginBottom:8 }}>
-                  <div style={{ width:24, height:24, borderRadius:6, flexShrink:0, background:COLOR.accent+"12", color:COLOR.accent, fontSize:11, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center" }}>1</div>
-                  <div style={{ fontSize:13, color:COLOR.text, lineHeight:1.7, paddingTop:2 }}>{recipe.steps[0]}</div>
+                  <div style={{ width:24, height:24, borderRadius:6, flexShrink:0, background:COLOR.accent+"12", color:COLOR.accent, fontSize:13, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center" }}>1</div>
+                  <div style={{ fontSize:15, color:COLOR.text, lineHeight:1.7, paddingTop:2 }}>{recipe.steps[0]}</div>
                 </div>
 
                 {isPremium ? (
                   <>
                     {recipe.steps.slice(1).map((s, i) => (
                       <div key={i+1} style={{ display:"flex", gap:8, marginBottom:8 }}>
-                        <div style={{ width:24, height:24, borderRadius:6, flexShrink:0, background:COLOR.accent+"12", color:COLOR.accent, fontSize:11, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center" }}>{i+2}</div>
-                        <div style={{ fontSize:13, color:COLOR.text, lineHeight:1.7, paddingTop:2 }}>{s}</div>
+                        <div style={{ width:24, height:24, borderRadius:6, flexShrink:0, background:COLOR.accent+"12", color:COLOR.accent, fontSize:13, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center" }}>{i+2}</div>
+                        <div style={{ fontSize:15, color:COLOR.text, lineHeight:1.7, paddingTop:2 }}>{s}</div>
                       </div>
                     ))}
                     {recipe.tips && (
                       <div style={{ padding:"10px 12px", borderRadius:8, background:COLOR.greenLight, border:`1px solid ${COLOR.green}20`, marginTop:6, marginBottom:8 }}>
-                        <span style={{ fontSize:12, fontWeight:700, color:COLOR.green }}>💡 コツ：</span>
-                        <span style={{ fontSize:13, color:COLOR.green, lineHeight:1.6 }}>{recipe.tips}</span>
+                        <span style={{ fontSize:14, fontWeight:700, color:COLOR.green }}>💡 コツ：</span>
+                        <span style={{ fontSize:15, color:COLOR.green, lineHeight:1.6 }}>{recipe.tips}</span>
                       </div>
                     )}
                     {recipe.makeAhead && (
                       <div style={{ padding:"10px 12px", borderRadius:8, background:"#e3f2fd", border:"1px solid #bbdefb" }}>
-                        <span style={{ fontSize:12, fontWeight:700, color:"#1565c0" }}>🧊 作り置き：</span>
-                        <span style={{ fontSize:13, color:"#1565c0", lineHeight:1.6 }}>{recipe.makeAhead}</span>
+                        <span style={{ fontSize:14, fontWeight:700, color:"#1565c0" }}>🧊 作り置き：</span>
+                        <span style={{ fontSize:15, color:"#1565c0", lineHeight:1.6 }}>{recipe.makeAhead}</span>
                       </div>
                     )}
                   </>
                 ) : (
                   <div style={{ marginTop:4, padding:"14px 12px", borderRadius:10, background:COLOR.premium+"06", border:`1px dashed ${COLOR.premium}30`, textAlign:"center" }}>
-                    <div style={{ fontSize:13, fontWeight:700, color:COLOR.premium, marginBottom:8 }}>📝 続きのレシピ＋時短コツを見る</div>
-                    <div style={{ fontSize:12, color:COLOR.premium, opacity:0.7 }}>🔒 プレミアムで解放予定</div>
+                    <div style={{ fontSize:15, fontWeight:700, color:COLOR.premium, marginBottom:8 }}>📝 続きのレシピ＋時短コツを見る</div>
+                    <div style={{ fontSize:14, color:COLOR.premium, opacity:0.7 }}>🔒 プレミアムで解放予定</div>
                   </div>
                 )}
               </div>
             ) : (
               <div>
                 <div style={{ marginBottom:10, padding:"10px 12px", borderRadius:10, background:COLOR.warm }}>
-                  <div style={{ display:"flex", alignItems:"baseline", gap:6, marginBottom:6 }}><span style={{ fontSize:12, fontWeight:800, color:COLOR.textSub }}>🥄 材料（1人分）</span><span style={{ fontSize:11, color:COLOR.textSub, opacity:.7 }}>※買い物リストで人数分に調整</span></div>
+                  <div style={{ display:"flex", alignItems:"baseline", gap:6, marginBottom:6 }}><span style={{ fontSize:14, fontWeight:800, color:COLOR.textSub }}>🥄 材料（1人分）</span><span style={{ fontSize:13, color:COLOR.textSub, opacity:.7 }}>※買い物リストで人数分に調整</span></div>
                   <div style={{ display:"flex", flexWrap:"wrap", gap:4 }}>
                     {meal.items.map((item, i) => (
-                      <span key={i} style={{ fontSize:12, color:COLOR.text, background:COLOR.card, padding:"4px 9px", borderRadius:6, border:`1px solid ${COLOR.border}`, lineHeight:1.4 }}>
+                      <span key={i} style={{ fontSize:14, color:COLOR.text, background:COLOR.card, padding:"4px 9px", borderRadius:6, border:`1px solid ${COLOR.border}`, lineHeight:1.4 }}>
                         {item.n} <span style={{ fontWeight:700, color:COLOR.accent }}>{formatQty(item.q)}{item.u}</span>
                       </span>
                     ))}
                   </div>
                 </div>
-                <div style={{ fontSize:13, color:COLOR.textSub }}>レシピ準備中</div>
+                <div style={{ fontSize:15, color:COLOR.textSub }}>レシピ準備中</div>
               </div>
             )}
           </div>
@@ -733,15 +801,15 @@ function MealCard({ mealType, meal, emoji, isPremium, dislikedNames, onAddExtra,
           {meal.extra && (
             <div style={{ marginTop:12, padding:"12px 14px", borderRadius:10, background:COLOR.greenLight, border:`1px solid ${COLOR.green}20` }}>
               <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:6 }}>
-                <span style={{ fontSize:14 }}>🥗</span>
-                <span style={{ fontSize:13, fontWeight:800, color:COLOR.green }}>副菜：{meal.extra.name}</span>
-                <span style={{ fontSize:11, color:COLOR.green, opacity:.7 }}>+{meal.extra.cal}kcal</span>
+                <span style={{ fontSize:16 }}>🥗</span>
+                <span style={{ fontSize:15, fontWeight:800, color:COLOR.green }}>副菜：{meal.extra.name}</span>
+                <span style={{ fontSize:13, color:COLOR.green, opacity:.7 }}>+{meal.extra.cal}kcal</span>
               </div>
-              <div style={{ fontSize:12, color:COLOR.green, marginBottom:6 }}>{meal.extra.reason}</div>
-              <div style={{ fontSize:12, color:COLOR.green, background:"#fff", padding:"8px 10px", borderRadius:8, lineHeight:1.6 }}>
+              <div style={{ fontSize:14, color:COLOR.green, marginBottom:6 }}>{meal.extra.reason}</div>
+              <div style={{ fontSize:14, color:COLOR.green, background:"#fff", padding:"8px 10px", borderRadius:8, lineHeight:1.6 }}>
                 {meal.extra.steps.split("|").map((step, i) => (
                   <div key={i} style={{ display:"flex", gap:6, marginBottom: i < meal.extra.steps.split("|").length - 1 ? 4 : 0 }}>
-                    <span style={{ fontSize:10, fontWeight:800, color:COLOR.green, opacity:.6, flexShrink:0 }}>{i+1}.</span>
+                    <span style={{ fontSize:12, fontWeight:800, color:COLOR.green, opacity:.6, flexShrink:0 }}>{i+1}.</span>
                     <span>{step.trim()}</span>
                   </div>
                 ))}
@@ -751,7 +819,7 @@ function MealCard({ mealType, meal, emoji, isPremium, dislikedNames, onAddExtra,
 
           {/* 副菜追加ボタン（Premiumのみ） */}
           {isPremium && !meal.extra && (
-            <button onClick={e => { e.stopPropagation(); handleSide(); }} style={{ width:"100%", marginTop:12, padding:"12px", borderRadius:10, border:`1.5px dashed ${COLOR.green}40`, background:COLOR.green+"06", fontSize:13, fontWeight:700, color:COLOR.green, cursor:"pointer", fontFamily:FONT }}>
+            <button onClick={e => { e.stopPropagation(); handleSide(); }} style={{ width:"100%", marginTop:12, padding:"12px", borderRadius:10, border:`1.5px dashed ${COLOR.green}40`, background:COLOR.green+"06", fontSize:15, fontWeight:700, color:COLOR.green, cursor:"pointer", fontFamily:FONT }}>
               🥗 副菜を追加する
             </button>
           )}
@@ -812,7 +880,7 @@ export default function App() {
     if (!sportId || !ageId || !goalId) return;
     setLoading(true);
     setTimeout(() => {
-      setDailyPlan(generateDailyPlan(goalId, dislikedNames));
+      setDailyPlan(generateDailyPlan(goalId, dislikedNames, [], needs?.cal));
       setScreen("result");
       setLoading(false);
       setChecked({});
@@ -828,7 +896,7 @@ export default function App() {
     setIsFirstResult(false);
     setWeeklyPlan(null);
     setShoppingScope("daily");
-    setTimeout(() => { setDailyPlan(generateDailyPlan(goalId, dislikedNames)); setLoading(false); setChecked({}); setTab("meal"); }, 500);
+    setTimeout(() => { setDailyPlan(generateDailyPlan(goalId, dislikedNames, [], needs?.cal)); setLoading(false); setChecked({}); setTab("meal"); }, 500);
   }
 
   function handleAddExtra(mealType, extra) {
@@ -850,7 +918,7 @@ export default function App() {
     const plans = [], allUsed = [];
     for (let i = 0; i < 7; i++) {
       await new Promise(r => setTimeout(r, 120));
-      const p = generateDailyPlan(goalId, dislikedNames, allUsed);
+      const p = generateDailyPlan(goalId, dislikedNames, allUsed, needs?.cal);
       plans.push(p); allUsed.push(p.breakfast.name, p.lunch.name, p.dinner.name); setWeekProgress(i + 1);
     }
     setWeeklyPlan(plans); setWeekDay(0); setWeekLoading(false); setTab("weekly"); setShoppingScope("weekly");
@@ -869,17 +937,17 @@ export default function App() {
           <div style={{ display:"flex", alignItems:"center", gap:8 }}>
             <div style={{ width:32, height:32, borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", background:`linear-gradient(135deg,${COLOR.accent},#e8913a)`, fontSize:16 }}>🍙</div>
             <div>
-              <div style={{ fontSize:15, fontWeight:900, color:COLOR.text }}>スポごはん</div>
-              <div style={{ fontSize:9, color:COLOR.textSub }}>v0.10.0</div>
+              <div style={{ fontSize:17, fontWeight:900, color:COLOR.text }}>スポごはん</div>
+              <div style={{ fontSize:10, color:COLOR.textSub }}>v0.10.0</div>
             </div>
           </div>
           <div style={{ display:"flex", gap:5 }}>
             {/* PREMIUM_TOGGLE: 将来復活用 — ボタン非表示 */}
-            {false && <button onClick={() => setIsPremium(!isPremium)} style={{ padding:"5px 11px", borderRadius:16, fontSize:11, fontWeight:700, cursor:"pointer", border: isPremium ? "none" : `1px solid ${COLOR.premium}40`, fontFamily:FONT, background: isPremium ? "linear-gradient(135deg,#c49a14,#e8b914)" : "transparent", color: isPremium ? "#fff" : COLOR.premium }}>
+            {false && <button onClick={() => setIsPremium(!isPremium)} style={{ padding:"5px 11px", borderRadius:16, fontSize:13, fontWeight:700, cursor:"pointer", border: isPremium ? "none" : `1px solid ${COLOR.premium}40`, fontFamily:FONT, background: isPremium ? "linear-gradient(135deg,#c49a14,#e8b914)" : "transparent", color: isPremium ? "#fff" : COLOR.premium }}>
               {isPremium ? "💎 ON" : "💎 OFF"}
             </button>}
             {screen === "result" && (
-              <button onClick={() => { setScreen("onboarding"); setDailyPlan(null); setWeeklyPlan(null); setShowWeeklyWall(false); }} style={{ background:COLOR.warm, border:"none", padding:"5px 11px", borderRadius:8, fontSize:12, color:COLOR.textSub, cursor:"pointer", fontFamily:FONT, fontWeight:600 }}>
+              <button onClick={() => { setScreen("onboarding"); setDailyPlan(null); setWeeklyPlan(null); setShowWeeklyWall(false); }} style={{ background:COLOR.warm, border:"none", padding:"5px 11px", borderRadius:8, fontSize:14, color:COLOR.textSub, cursor:"pointer", fontFamily:FONT, fontWeight:600 }}>
                 ← 戻る
               </button>
             )}
@@ -892,44 +960,44 @@ export default function App() {
             <div style={{ textAlign:"center", padding:"24px 0 16px" }}>
               <div style={{ fontSize:40, marginBottom:6 }}>🏃‍♂️🍳</div>
               <h1 style={{ fontSize:20, fontWeight:900, color:COLOR.text, margin:"0 0 4px", lineHeight:1.4 }}>お子さんについて<br/>教えてください</h1>
-              <p style={{ fontSize:13, color:COLOR.textSub, margin:0 }}>最適な献立とレシピを提案します</p>
+              <p style={{ fontSize:15, color:COLOR.textSub, margin:0 }}>最適な献立とレシピを提案します</p>
             </div>
 
             {/* 競技 */}
             <div style={{ marginBottom:20 }}>
-              <label style={{ fontSize:13, fontWeight:800, color:COLOR.text, display:"block", marginBottom:6 }}>🏅 競技</label>
+              <label style={{ fontSize:15, fontWeight:800, color:COLOR.text, display:"block", marginBottom:6 }}>🏅 競技</label>
               <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
                 {SPORTS.map(s => (
-                  <button key={s.id} onClick={() => setSportId(s.id)} style={{ padding:"8px 14px", borderRadius:20, border:`1.5px solid ${sportId === s.id ? "transparent" : COLOR.border}`, background: sportId === s.id ? COLOR.accent : "transparent", color: sportId === s.id ? "#fff" : COLOR.text, fontSize:13, fontWeight: sportId === s.id ? 700 : 500, cursor:"pointer", fontFamily:FONT }}>{s.emoji} {s.name}</button>
+                  <button key={s.id} onClick={() => setSportId(s.id)} style={{ padding:"8px 14px", borderRadius:20, border:`1.5px solid ${sportId === s.id ? "transparent" : COLOR.border}`, background: sportId === s.id ? COLOR.accent : "transparent", color: sportId === s.id ? "#fff" : COLOR.text, fontSize:15, fontWeight: sportId === s.id ? 700 : 500, cursor:"pointer", fontFamily:FONT }}>{s.emoji} {s.name}</button>
                 ))}
               </div>
             </div>
 
             {/* 年齢 */}
             <div style={{ marginBottom:20 }}>
-              <label style={{ fontSize:13, fontWeight:800, color:COLOR.text, display:"block", marginBottom:6 }}>📅 年齢</label>
+              <label style={{ fontSize:15, fontWeight:800, color:COLOR.text, display:"block", marginBottom:6 }}>📅 年齢</label>
               <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
                 {AGES.map(a => (
-                  <button key={a.id} onClick={() => setAgeId(a.id)} style={{ padding:"8px 14px", borderRadius:20, border:`1.5px solid ${ageId === a.id ? "transparent" : COLOR.border}`, background: ageId === a.id ? COLOR.green : "transparent", color: ageId === a.id ? "#fff" : COLOR.text, fontSize:13, fontWeight: ageId === a.id ? 700 : 500, cursor:"pointer", fontFamily:FONT }}>{a.label}</button>
+                  <button key={a.id} onClick={() => setAgeId(a.id)} style={{ padding:"8px 14px", borderRadius:20, border:`1.5px solid ${ageId === a.id ? "transparent" : COLOR.border}`, background: ageId === a.id ? COLOR.green : "transparent", color: ageId === a.id ? "#fff" : COLOR.text, fontSize:15, fontWeight: ageId === a.id ? 700 : 500, cursor:"pointer", fontFamily:FONT }}>{a.label}</button>
                 ))}
               </div>
             </div>
 
             {needs && (
               <div style={{ background:COLOR.greenLight, borderRadius:12, padding:"10px 14px", marginBottom:10, border:`1px solid ${COLOR.green}20` }}>
-                <div style={{ fontSize:12, color:COLOR.green, fontWeight:700 }}>📊 推定1日</div>
+                <div style={{ fontSize:14, color:COLOR.green, fontWeight:700 }}>📊 推定1日</div>
                 <div style={{ display:"flex", gap:14 }}>
                   <span style={{ fontSize:18, fontWeight:900, color:COLOR.green }}>{needs.cal}kcal</span>
-                  <span style={{ fontSize:13, fontWeight:700, color:COLOR.green }}>P {needs.protein}g</span>
+                  <span style={{ fontSize:15, fontWeight:700, color:COLOR.green }}>P {needs.protein}g</span>
                 </div>
               </div>
             )}
             {needs && (
               <div style={{ padding:"8px 12px", marginBottom:20, borderRadius:8, background:COLOR.warm, border:`1px solid ${COLOR.border}` }}>
-                <div style={{ fontSize:11, color:COLOR.textSub, lineHeight:1.7 }}>
+                <div style={{ fontSize:13, color:COLOR.textSub, lineHeight:1.7 }}>
                   💡 この数値は選択した年齢・競技の<span style={{ fontWeight:700 }}>男女平均</span>の目安です。男の子は+10%、女の子は−10%を目安に調整してください。
                 </div>
-                <div style={{ fontSize:11, color:COLOR.textSub, lineHeight:1.7, marginTop:2 }}>
+                <div style={{ fontSize:13, color:COLOR.textSub, lineHeight:1.7, marginTop:2 }}>
                   👨‍👩‍👧‍👦 買い物リストの「何人分？」は<span style={{ fontWeight:700 }}>この基準の1人分</span>です。大人の分は少し減らしてお使いください。
                 </div>
               </div>
@@ -937,15 +1005,15 @@ export default function App() {
 
             {/* 苦手食材 */}
             <div style={{ marginBottom:20 }}>
-              <label style={{ fontSize:13, fontWeight:800, color:COLOR.text, display:"block", marginBottom:6 }}>
-                🙅 苦手な食材<span style={{ fontSize:12, fontWeight:500, color:COLOR.textSub, marginLeft:6 }}>{isPremium ? "無制限" : "3つまで"}</span>
+              <label style={{ fontSize:15, fontWeight:800, color:COLOR.text, display:"block", marginBottom:6 }}>
+                🙅 苦手な食材<span style={{ fontSize:14, fontWeight:500, color:COLOR.textSub, marginLeft:6 }}>{isPremium ? "無制限" : "3つまで"}</span>
               </label>
               <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
                 {DISLIKE_LIST.map(d => {
                   const selected = dislikes.includes(d.id);
                   const disabled = !selected && dislikes.length >= 3 && !isPremium;
                   return (
-                    <button key={d.id} onClick={() => toggleDislike(d.id)} style={{ padding:"8px 12px", borderRadius:20, fontSize:13, fontFamily:FONT, cursor: disabled ? "pointer" : "pointer", border: selected ? "2px solid #c44" : `1.5px solid ${COLOR.border}`, background: selected ? "#fef2f2" : "transparent", color: selected ? "#c44" : COLOR.text, fontWeight: selected ? 700 : 500, opacity: disabled ? .5 : 1 }}>
+                    <button key={d.id} onClick={() => toggleDislike(d.id)} style={{ padding:"8px 12px", borderRadius:20, fontSize:15, fontFamily:FONT, cursor: disabled ? "pointer" : "pointer", border: selected ? "2px solid #c44" : `1.5px solid ${COLOR.border}`, background: selected ? "#fef2f2" : "transparent", color: selected ? "#c44" : COLOR.text, fontWeight: selected ? 700 : 500, opacity: disabled ? .5 : 1 }}>
                       {d.emoji} {d.label}{selected ? " ✕" : ""}
                     </button>
                   );
@@ -954,27 +1022,27 @@ export default function App() {
               {/* PY-03: ソフトウォール */}
               {showDislikeWall && !isPremium && (
                 <div style={{ marginTop:8, padding:"12px 14px", borderRadius:12, background:COLOR.premium+"08", border:`1px solid ${COLOR.premium}20` }}>
-                  <div style={{ fontSize:13, fontWeight:700, color:COLOR.premium, marginBottom:8 }}>🙅 4つ以上の食材を除外するにはプレミアムが必要です</div>
-                  <div style={{ fontSize:12, color:COLOR.premium, opacity:0.7 }}>🔒 プレミアムで解放予定</div>
+                  <div style={{ fontSize:15, fontWeight:700, color:COLOR.premium, marginBottom:8 }}>🙅 4つ以上の食材を除外するにはプレミアムが必要です</div>
+                  <div style={{ fontSize:14, color:COLOR.premium, opacity:0.7 }}>🔒 プレミアムで解放予定</div>
                 </div>
               )}
             </div>
 
             {/* 目標 */}
             <div style={{ marginBottom:24 }}>
-              <label style={{ fontSize:13, fontWeight:800, color:COLOR.text, display:"block", marginBottom:6 }}>🎯 目標</label>
+              <label style={{ fontSize:15, fontWeight:800, color:COLOR.text, display:"block", marginBottom:6 }}>🎯 目標</label>
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
                 {GOALS.map(g => (
                   <button key={g.id} onClick={() => setGoalId(g.id)} style={{ padding:"12px 10px", borderRadius:12, textAlign:"left", fontFamily:FONT, border: goalId === g.id ? `2px solid ${COLOR.accent}` : `1.5px solid ${COLOR.border}`, background: goalId === g.id ? COLOR.accentLight : COLOR.card, cursor:"pointer" }}>
                     <div style={{ fontSize:20, marginBottom:2 }}>{g.emoji}</div>
-                    <div style={{ fontSize:13, fontWeight:700, color:COLOR.text }}>{g.name}</div>
-                    <div style={{ fontSize:12, color:COLOR.textSub }}>{g.focus}</div>
+                    <div style={{ fontSize:15, fontWeight:700, color:COLOR.text }}>{g.name}</div>
+                    <div style={{ fontSize:14, color:COLOR.textSub }}>{g.focus}</div>
                   </button>
                 ))}
               </div>
             </div>
 
-            <button onClick={handleGenerate} disabled={!sportId || !ageId || !goalId || loading} style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", fontFamily:FONT, background: sportId && ageId && goalId ? `linear-gradient(135deg,${COLOR.accent},#e8913a)` : COLOR.border, color: sportId && ageId && goalId ? "#fff" : COLOR.textSub, fontSize:15, fontWeight:800, cursor: sportId && ageId && goalId ? "pointer" : "not-allowed" }}>
+            <button onClick={handleGenerate} disabled={!sportId || !ageId || !goalId || loading} style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", fontFamily:FONT, background: sportId && ageId && goalId ? `linear-gradient(135deg,${COLOR.accent},#e8913a)` : COLOR.border, color: sportId && ageId && goalId ? "#fff" : COLOR.textSub, fontSize:17, fontWeight:800, cursor: sportId && ageId && goalId ? "pointer" : "not-allowed" }}>
               {loading ? "生成中..." : "🍽️ 今日の献立を提案する"}
             </button>
           </div>
@@ -987,10 +1055,10 @@ export default function App() {
             <div style={{ margin:"12px 0 10px", padding:"10px 14px", borderRadius:12, background:COLOR.warm, display:"flex", alignItems:"center", gap:10 }}>
               <span style={{ fontSize:22 }}>{sportObj?.emoji}</span>
               <div>
-                <div style={{ fontSize:14, fontWeight:800, color:COLOR.text }}>{sportObj?.name}・{ageObj?.label}</div>
+                <div style={{ fontSize:16, fontWeight:800, color:COLOR.text }}>{sportObj?.name}・{ageObj?.label}</div>
                 <div style={{ display:"flex", gap:6 }}>
-                  <span style={{ fontSize:12, color:COLOR.accent, fontWeight:600 }}>{goalObj?.emoji} {goalObj?.name}</span>
-                  {dislikes.length > 0 && <span style={{ fontSize:12, color:"#c44", fontWeight:600 }}>🚫{dislikes.map(d => DISLIKE_LIST.find(x => x.id === d)?.label).join("・")}</span>}
+                  <span style={{ fontSize:14, color:COLOR.accent, fontWeight:600 }}>{goalObj?.emoji} {goalObj?.name}</span>
+                  {dislikes.length > 0 && <span style={{ fontSize:14, color:"#c44", fontWeight:600 }}>🚫{dislikes.map(d => DISLIKE_LIST.find(x => x.id === d)?.label).join("・")}</span>}
                 </div>
               </div>
             </div>
@@ -998,8 +1066,8 @@ export default function App() {
             {/* PY-02: PREMIUM_CTA: 将来復活用 — 非表示 */}
             {false && !isPremium && isFirstResult && (
               <div style={{ marginBottom:12, padding:"12px 14px", borderRadius:12, background:COLOR.accentLight, border:`1px solid ${COLOR.accent}20`, display:"flex", alignItems:"center", justifyContent:"space-between", gap:8 }}>
-                <div style={{ fontSize:12, color:COLOR.accent, fontWeight:600, lineHeight:1.5 }}>🍽️ 献立ができました！<br/>レシピも見たい場合は →</div>
-                <button onClick={activateTrial} style={{ flexShrink:0, padding:"8px 14px", borderRadius:10, border:"none", background:`linear-gradient(135deg,${COLOR.accent},#e8913a)`, color:"#fff", fontSize:11, fontWeight:800, cursor:"pointer", fontFamily:FONT, whiteSpace:"nowrap" }}>14日間 無料おためし</button>
+                <div style={{ fontSize:14, color:COLOR.accent, fontWeight:600, lineHeight:1.5 }}>🍽️ 献立ができました！<br/>レシピも見たい場合は →</div>
+                <button onClick={activateTrial} style={{ flexShrink:0, padding:"8px 14px", borderRadius:10, border:"none", background:`linear-gradient(135deg,${COLOR.accent},#e8913a)`, color:"#fff", fontSize:13, fontWeight:800, cursor:"pointer", fontFamily:FONT, whiteSpace:"nowrap" }}>14日間 無料おためし</button>
               </div>
             )}
 
@@ -1007,10 +1075,10 @@ export default function App() {
             {showWeeklyWall && !isPremium && (
               <div style={{ marginBottom:12, padding:"20px 16px", borderRadius:14, background:COLOR.card, border:`2px solid ${COLOR.accent}30`, textAlign:"center" }}>
                 <div style={{ fontSize:32, marginBottom:6 }}>📅</div>
-                <div style={{ fontSize:14, fontWeight:800, color:COLOR.text, marginBottom:4 }}>1週間まとめて献立を作れます</div>
-                <div style={{ fontSize:12, color:COLOR.textSub, marginBottom:12 }}>毎日考えなくてOK。買い物リストも自動で出ます</div>
-                <div style={{ fontSize:12, color:COLOR.premium, opacity:0.7 }}>🔒 プレミアムで解放予定</div>
-                <button onClick={() => setShowWeeklyWall(false)} style={{ marginTop:8, background:"none", border:"none", fontSize:12, color:COLOR.textSub, cursor:"pointer", fontFamily:FONT }}>閉じる</button>
+                <div style={{ fontSize:16, fontWeight:800, color:COLOR.text, marginBottom:4 }}>1週間まとめて献立を作れます</div>
+                <div style={{ fontSize:14, color:COLOR.textSub, marginBottom:12 }}>毎日考えなくてOK。買い物リストも自動で出ます</div>
+                <div style={{ fontSize:14, color:COLOR.premium, opacity:0.7 }}>🔒 プレミアムで解放予定</div>
+                <button onClick={() => setShowWeeklyWall(false)} style={{ marginTop:8, background:"none", border:"none", fontSize:14, color:COLOR.textSub, cursor:"pointer", fontFamily:FONT }}>閉じる</button>
               </div>
             )}
 
@@ -1019,8 +1087,8 @@ export default function App() {
               <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                 <span style={{ fontSize:18 }}>🏫</span>
                 <div>
-                  <div style={{ fontSize:13, fontWeight:700, color:COLOR.text }}>今日は給食あり</div>
-                  <div style={{ fontSize:11, color:COLOR.textSub }}>{hasSchoolLunch ? "昼食をスキップ中" : "ONにすると昼食を省きます"}</div>
+                  <div style={{ fontSize:15, fontWeight:700, color:COLOR.text }}>今日は給食あり</div>
+                  <div style={{ fontSize:13, color:COLOR.textSub }}>{hasSchoolLunch ? "昼食をスキップ中" : "ONにすると昼食を省きます"}</div>
                 </div>
               </div>
               <div style={{ width:44, height:24, borderRadius:12, background: hasSchoolLunch ? "#42a5f5" : "#ccc", position:"relative", transition:"background .2s" }}>
@@ -1031,7 +1099,7 @@ export default function App() {
             {/* タブ */}
             <div style={{ display:"flex", gap:3, marginBottom:12, background:"#e5e2dc", borderRadius:10, padding:3 }}>
               {[{ id:"meal", l:"🍽 今日" }, { id:"list", l:"🛒 買物" }, { id:"weekly", l:"📅 週間" }].map(t => (
-                <button key={t.id} onClick={() => handleTabChange(t.id)} style={{ flex:1, padding:"8px 4px", border:"none", borderRadius:8, fontSize:13, fontWeight: tab === t.id ? 700 : 500, fontFamily:FONT, cursor:"pointer", background: tab === t.id ? "#fff" : "transparent", color: tab === t.id ? COLOR.text : COLOR.textSub }}>{t.l}</button>
+                <button key={t.id} onClick={() => handleTabChange(t.id)} style={{ flex:1, padding:"8px 4px", border:"none", borderRadius:8, fontSize:15, fontWeight: tab === t.id ? 700 : 500, fontFamily:FONT, cursor:"pointer", background: tab === t.id ? "#fff" : "transparent", color: tab === t.id ? COLOR.text : COLOR.textSub }}>{t.l}</button>
               ))}
             </div>
 
@@ -1041,32 +1109,35 @@ export default function App() {
                 {/* DEC-006: 栄養バー（無料=カロリーのみ、P/C/Fロック） */}
                 <div style={{ background:COLOR.card, borderRadius:14, padding:14, marginBottom:12, border:`1px solid ${COLOR.border}` }}>
                   <div style={{ display:"flex", alignItems:"baseline", justifyContent:"space-between", marginBottom:10 }}>
-                    <div style={{ fontSize:13, fontWeight:800, color:COLOR.text }}>📊 栄養バランス</div>
-                    <div style={{ fontSize:10, color:COLOR.textSub, fontWeight:600 }}>{hasSchoolLunch ? "朝・夕・補食の合計値（昼は給食）" : "朝・昼・夕・補食の合計値"}</div>
+                    <div style={{ fontSize:15, fontWeight:800, color:COLOR.text }}>📊 栄養バランス</div>
+                    <div style={{ fontSize:12, color:COLOR.textSub, fontWeight:600 }}>{hasSchoolLunch ? "朝・夕・補食の合計値（昼は給食）" : "朝・昼・夕・補食の合計値"}</div>
                   </div>
                   {(() => { const skip = hasSchoolLunch ? ["lunch"] : []; const n = sumNutrition(dailyPlan, skip); return (<>
-                  <NutritionBar label="エネルギー（kcal）" current={n.cal} target={needs?.cal || 2000} color={COLOR.accent} unit="kcal" locked={false} />
-                  <NutritionBar label="タンパク質（P）" current={n.p}   target={needs?.protein || 60} color="#c4652e" unit="g" locked={!isPremium} />
-                  <NutritionBar label="炭水化物（C）"   current={n.c}   target={Math.round((needs?.cal || 2000) * .55 / 4)} color={COLOR.green} unit="g" locked={!isPremium} />
-                  <NutritionBar label="脂質（F）"       current={n.f}   target={Math.round((needs?.cal || 2000) * .25 / 9)} color={COLOR.blue} unit="g" locked={!isPremium} />
+                  <NutritionBar label="エネルギー（kcal）" current={n.cal} target={needs?.cal || 2000} color={COLOR.accent} unit="kcal" locked={false} hint="1日に燃やす燃料の総量。足りないと練習中にバテやすくなります" />
+                  <NutritionBar label="タンパク質（P）" current={n.p}   target={needs?.protein || 60} color="#c4652e" unit="g" locked={!isPremium} hint="筋肉・骨・血液の材料。成長期のアスリートは大人より多く必要です" />
+                  <NutritionBar label="炭水化物（C）"   current={n.c}   target={Math.round((needs?.cal || 2000) * .55 / 4)} color={COLOR.green} unit="g" locked={!isPremium} hint="練習中のガソリン。不足すると集中力が落ち、ケガのリスクも上がります" />
+                  <NutritionBar label="脂質（F）"       current={n.f}   target={Math.round((needs?.cal || 2000) * .25 / 9)} color={COLOR.blue} unit="g" locked={!isPremium} hint="ホルモンや細胞膜の材料。摂りすぎると体が重くなり、少なすぎると成長に影響します" />
                   </>); })()}
+                  <div style={{ padding:"6px 10px", borderRadius:6, background:COLOR.warm, fontSize:12, color:COLOR.textSub, lineHeight:1.6 }}>
+                    🍚 目標カロリーに近づくよう、ご飯の量を自動で調整しています。お子さんの食べ具合に合わせて加減してください。
+                  </div>
                 </div>
-                {isPremium && <div style={{ padding:"8px 12px", marginBottom:12, borderRadius:10, background:COLOR.accent+"08", fontSize:12, color:COLOR.accent, fontWeight:600 }}>✨ タップ → レシピ即表示＆副菜提案</div>}
+                {isPremium && <div style={{ padding:"8px 12px", marginBottom:12, borderRadius:10, background:COLOR.accent+"08", fontSize:14, color:COLOR.accent, fontWeight:600 }}>✨ タップ → レシピ即表示＆副菜提案</div>}
                 <div style={{ display:"flex", flexDirection:"column", gap:10, marginBottom:12 }}>
                   {MEAL_TYPES.map(([k, e]) => {
                     if (k === "lunch" && hasSchoolLunch) return (
                       <div key={k} style={{ background:COLOR.card, borderRadius:14, padding:"14px 16px", border:`1px solid ${COLOR.border}`, display:"flex", alignItems:"center", gap:10 }}>
                         <span style={{ fontSize:22 }}>🏫</span>
                         <div>
-                          <div style={{ fontSize:13, fontWeight:700, color:COLOR.text }}>昼食：給食</div>
-                          <div style={{ fontSize:11, color:COLOR.textSub }}>今日は給食の日です</div>
+                          <div style={{ fontSize:15, fontWeight:700, color:COLOR.text }}>昼食：給食</div>
+                          <div style={{ fontSize:13, color:COLOR.textSub }}>今日は給食の日です</div>
                         </div>
                       </div>
                     );
                     return <MealCard key={k} mealType={k} meal={dailyPlan[k]} emoji={e} isPremium={isPremium} dislikedNames={dislikedNames} onAddExtra={handleAddExtra} onTrial={activateTrial} />;
                   })}
                 </div>
-                <button onClick={handleRegenerate} disabled={loading} style={{ width:"100%", padding:"12px", borderRadius:12, border:`1.5px solid ${COLOR.border}`, background:COLOR.card, fontSize:14, fontWeight:700, cursor:"pointer", fontFamily:FONT, color:COLOR.text }}>
+                <button onClick={handleRegenerate} disabled={loading} style={{ width:"100%", padding:"12px", borderRadius:12, border:`1.5px solid ${COLOR.border}`, background:COLOR.card, fontSize:16, fontWeight:700, cursor:"pointer", fontFamily:FONT, color:COLOR.text }}>
                   {loading ? "🔄 生成中..." : "🔄 別の献立にする"}
                 </button>
               </div>
@@ -1079,8 +1150,8 @@ export default function App() {
                   {/* 買い物リストの対象範囲切り替え */}
                   {weeklyPlan && dailyPlan && (
                     <div style={{ display:"flex", gap:3, marginBottom:10, background:"#e5e2dc", borderRadius:8, padding:3 }}>
-                      <button onClick={() => setShoppingScope("daily")} style={{ flex:1, padding:"7px 4px", border:"none", borderRadius:6, fontSize:12, fontWeight: shoppingScope === "daily" ? 700 : 500, fontFamily:FONT, cursor:"pointer", background: shoppingScope === "daily" ? "#fff" : "transparent", color: shoppingScope === "daily" ? COLOR.text : COLOR.textSub }}>🍽 今日の1日分</button>
-                      <button onClick={() => setShoppingScope("weekly")} style={{ flex:1, padding:"7px 4px", border:"none", borderRadius:6, fontSize:12, fontWeight: shoppingScope === "weekly" ? 700 : 500, fontFamily:FONT, cursor:"pointer", background: shoppingScope === "weekly" ? "#fff" : "transparent", color: shoppingScope === "weekly" ? COLOR.text : COLOR.textSub }}>📅 1週間分</button>
+                      <button onClick={() => setShoppingScope("daily")} style={{ flex:1, padding:"7px 4px", border:"none", borderRadius:6, fontSize:14, fontWeight: shoppingScope === "daily" ? 700 : 500, fontFamily:FONT, cursor:"pointer", background: shoppingScope === "daily" ? "#fff" : "transparent", color: shoppingScope === "daily" ? COLOR.text : COLOR.textSub }}>🍽 今日の1日分</button>
+                      <button onClick={() => setShoppingScope("weekly")} style={{ flex:1, padding:"7px 4px", border:"none", borderRadius:6, fontSize:14, fontWeight: shoppingScope === "weekly" ? 700 : 500, fontFamily:FONT, cursor:"pointer", background: shoppingScope === "weekly" ? "#fff" : "transparent", color: shoppingScope === "weekly" ? COLOR.text : COLOR.textSub }}>📅 1週間分</button>
                     </div>
                   )}
                   {/* 対象範囲ラベル（切り替えがない場合） */}
@@ -1088,8 +1159,8 @@ export default function App() {
                     <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10, padding:"8px 12px", borderRadius:8, background: weeklyPlan ? "#e3f2fd" : COLOR.accentLight }}>
                       <span style={{ fontSize:16 }}>{weeklyPlan ? "📅" : "🍽"}</span>
                       <div style={{ flex:1 }}>
-                        <div style={{ fontSize:13, fontWeight:800, color: weeklyPlan ? "#1565c0" : COLOR.accent }}>{weeklyPlan ? "1週間分（7日間）" : "今日の1日分"}</div>
-                        <div style={{ fontSize:11, color: weeklyPlan ? "#42a5f5" : COLOR.textSub }}>{weeklyPlan ? "週間献立から自動計算" : "今日の献立から自動計算"}</div>
+                        <div style={{ fontSize:15, fontWeight:800, color: weeklyPlan ? "#1565c0" : COLOR.accent }}>{weeklyPlan ? "1週間分（7日間）" : "今日の1日分"}</div>
+                        <div style={{ fontSize:13, color: weeklyPlan ? "#42a5f5" : COLOR.textSub }}>{weeklyPlan ? "週間献立から自動計算" : "今日の献立から自動計算"}</div>
                       </div>
                     </div>
                   )}
@@ -1097,38 +1168,38 @@ export default function App() {
                   {hasSchoolLunch && (
                     <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10, padding:"8px 12px", borderRadius:8, background:"#fff3e0", border:"1px solid #ffe0b2" }}>
                       <span style={{ fontSize:16 }}>🏫</span>
-                      <div style={{ fontSize:12, fontWeight:700, color:"#e65100" }}>給食あり → 昼食の材料を除外中</div>
+                      <div style={{ fontSize:14, fontWeight:700, color:"#e65100" }}>給食あり → 昼食の材料を除外中</div>
                     </div>
                   )}
                   <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:8, padding:"10px 12px", borderRadius:12, background:COLOR.greenLight }}>
-                    <div style={{ fontSize:13, fontWeight:800, color:COLOR.green }}>👨‍👩‍👧‍👦 何人分？</div>
+                    <div style={{ fontSize:15, fontWeight:800, color:COLOR.green }}>👨‍👩‍👧‍👦 何人分？</div>
                     <div style={{ display:"flex", alignItems:"center", gap:6 }}>
                       <button onClick={() => setServings(Math.max(1, servings - 1))} style={{ width:30, height:30, borderRadius:8, border:`1px solid ${COLOR.green}40`, background:"#fff", fontSize:16, cursor:"pointer", color:COLOR.green, fontWeight:700 }}>−</button>
                       <span style={{ fontSize:20, fontWeight:900, color:COLOR.green, minWidth:30, textAlign:"center" }}>{servings}</span>
                       <button onClick={() => setServings(Math.min(8, servings + 1))} style={{ width:30, height:30, borderRadius:8, border:`1px solid ${COLOR.green}40`, background:"#fff", fontSize:16, cursor:"pointer", color:COLOR.green, fontWeight:700 }}>+</button>
-                      <span style={{ fontSize:12, color:COLOR.green, fontWeight:700 }}>人分</span>
+                      <span style={{ fontSize:14, color:COLOR.green, fontWeight:700 }}>人分</span>
                     </div>
                   </div>
                   {/* ②③④ 人数の補足説明 — 奥さんレビュー対応 */}
                   <div style={{ padding:"8px 12px", marginBottom:12, borderRadius:8, background:COLOR.warm, border:`1px solid ${COLOR.border}` }}>
-                    <div style={{ fontSize:11, color:COLOR.textSub, lineHeight:1.7 }}>
+                    <div style={{ fontSize:13, color:COLOR.textSub, lineHeight:1.7 }}>
                       📌 <span style={{ fontWeight:700 }}>1人分 = {sportObj?.name || "選択した競技"}・{ageObj?.label || "選択した年齢"}のお子さん基準</span>の量です
                     </div>
-                    <div style={{ fontSize:11, color:COLOR.textSub, lineHeight:1.7, marginTop:2 }}>
+                    <div style={{ fontSize:13, color:COLOR.textSub, lineHeight:1.7, marginTop:2 }}>
                       💡 大人の分は<span style={{ fontWeight:700 }}>少し減らして</span>、スポーツをしていないお子さんは<span style={{ fontWeight:700 }}>7〜8割</span>を目安に調整してください
                     </div>
                   </div>
                   {Object.entries(buildShoppingList(shoppingScope === "weekly" && weeklyPlan ? weeklyPlan : dailyPlan, servings, hasSchoolLunch ? ["lunch"] : [])).map(([cat, items]) =>
                     items.length > 0 && (
                       <div key={cat} style={{ marginBottom:14 }}>
-                        <div style={{ fontSize:12, fontWeight:700, color:COLOR.textSub, marginBottom:4, paddingBottom:3, borderBottom:`1px solid ${COLOR.border}` }}>{cat}</div>
+                        <div style={{ fontSize:14, fontWeight:700, color:COLOR.textSub, marginBottom:4, paddingBottom:3, borderBottom:`1px solid ${COLOR.border}` }}>{cat}</div>
                         {items.map((it, j) => {
                           const key = cat + it.n;
                           return (
                             <label key={j} style={{ display:"flex", alignItems:"center", gap:8, padding:"7px 10px", borderRadius:8, cursor:"pointer", background: checked[key] ? COLOR.greenLight : "transparent" }}>
                               <input type="checkbox" checked={!!checked[key]} onChange={() => setChecked(p => ({ ...p, [key]: !p[key] }))} style={{ width:16, height:16, accentColor:COLOR.green }} />
-                              <span style={{ flex:1, fontSize:13, color: checked[key] ? COLOR.textSub : COLOR.text, textDecoration: checked[key] ? "line-through" : "none" }}>{it.n}</span>
-                              <span style={{ fontSize:13, fontWeight:700, color: checked[key] ? COLOR.textSub : COLOR.accent, textDecoration: checked[key] ? "line-through" : "none" }}>{(() => { const s = toShoppingUnit(it.n, it.q, it.u); return `${formatQty(s.q)} ${s.u}`; })()}</span>
+                              <span style={{ flex:1, fontSize:15, color: checked[key] ? COLOR.textSub : COLOR.text, textDecoration: checked[key] ? "line-through" : "none" }}>{it.n}</span>
+                              <span style={{ fontSize:15, fontWeight:700, color: checked[key] ? COLOR.textSub : COLOR.accent, textDecoration: checked[key] ? "line-through" : "none" }}>{(() => { const s = toShoppingUnit(it.n, it.q, it.u); return `${formatQty(s.q)} ${s.u}`; })()}</span>
                             </label>
                           );
                         })}
@@ -1146,8 +1217,8 @@ export default function App() {
                   {!weeklyPlan ? (
                     <div style={{ background:COLOR.card, borderRadius:14, padding:24, textAlign:"center", border:`1px solid ${COLOR.border}` }}>
                       <div style={{ fontSize:40, marginBottom:8 }}>📅</div>
-                      <div style={{ fontSize:15, fontWeight:800, color:COLOR.text, marginBottom:16 }}>1週間分の献立を一括作成</div>
-                      <button onClick={handleWeekGenerate} disabled={weekLoading} style={{ padding:"14px 28px", borderRadius:12, border:"none", background:`linear-gradient(135deg,${COLOR.accent},#e8913a)`, color:"#fff", fontSize:14, fontWeight:800, cursor:"pointer", fontFamily:FONT }}>
+                      <div style={{ fontSize:17, fontWeight:800, color:COLOR.text, marginBottom:16 }}>1週間分の献立を一括作成</div>
+                      <button onClick={handleWeekGenerate} disabled={weekLoading} style={{ padding:"14px 28px", borderRadius:12, border:"none", background:`linear-gradient(135deg,${COLOR.accent},#e8913a)`, color:"#fff", fontSize:16, fontWeight:800, cursor:"pointer", fontFamily:FONT }}>
                         {weekLoading ? `${weekProgress}/7日 生成中...` : "🗓 1週間分を作成する"}
                       </button>
                     </div>
@@ -1155,16 +1226,18 @@ export default function App() {
                     <div>
                       <div style={{ display:"flex", gap:4, marginBottom:12 }}>
                         {DAY_LABELS.map((d, i) => (
-                          <button key={i} onClick={() => setWeekDay(i)} style={{ minWidth:44, padding:"10px 6px", borderRadius:10, border:"none", fontFamily:FONT, cursor:"pointer", background: weekDay === i ? COLOR.accent : "#fff", color: weekDay === i ? "#fff" : COLOR.text, fontSize:12, fontWeight: weekDay === i ? 800 : 500, display:"flex", flexDirection:"column", alignItems:"center", gap:2 }}>
-                            <span style={{ fontSize:11, opacity:.7 }}>{d}</span>
+                          <button key={i} onClick={() => setWeekDay(i)} style={{ minWidth:44, padding:"10px 6px", borderRadius:10, border:"none", fontFamily:FONT, cursor:"pointer", background: weekDay === i ? COLOR.accent : "#fff", color: weekDay === i ? "#fff" : COLOR.text, fontSize:14, fontWeight: weekDay === i ? 800 : 500, display:"flex", flexDirection:"column", alignItems:"center", gap:2 }}>
+                            <span style={{ fontSize:13, opacity:.7 }}>{d}</span>
                           </button>
                         ))}
                       </div>
                       <div style={{ background:COLOR.card, borderRadius:14, padding:14, marginBottom:12, border:`1px solid ${COLOR.border}` }}>
-                        <div style={{ fontSize:13, fontWeight:800, color:COLOR.text, marginBottom:10 }}>📊 {DAY_LABELS[weekDay]}曜日{hasSchoolLunch ? "（昼は給食）" : ""}</div>
+                        <div style={{ fontSize:15, fontWeight:800, color:COLOR.text, marginBottom:10 }}>📊 {DAY_LABELS[weekDay]}曜日{hasSchoolLunch ? "（昼は給食）" : ""}</div>
                         {(() => { const skip = hasSchoolLunch ? ["lunch"] : []; const n = sumNutrition(weeklyPlan[weekDay], skip); return (<>
-                        <NutritionBar label="エネルギー（kcal）" current={n.cal} target={needs?.cal || 2000} color={COLOR.accent} unit="kcal" locked={false} />
-                        <NutritionBar label="タンパク質（P）" current={n.p}   target={needs?.protein || 60} color="#c4652e" unit="g" locked={false} />
+                        <NutritionBar label="エネルギー（kcal）" current={n.cal} target={needs?.cal || 2000} color={COLOR.accent} unit="kcal" locked={false} hint="1日に燃やす燃料の総量。足りないと練習中にバテやすくなります" />
+                        <NutritionBar label="タンパク質（P）" current={n.p}   target={needs?.protein || 60} color="#c4652e" unit="g" locked={false} hint="筋肉・骨・血液の材料。成長期のアスリートは大人より多く必要です" />
+                        <NutritionBar label="炭水化物（C）"   current={n.c}   target={Math.round((needs?.cal || 2000) * .55 / 4)} color={COLOR.green} unit="g" locked={false} hint="練習中のガソリン。不足すると集中力が落ち、ケガのリスクも上がります" />
+                        <NutritionBar label="脂質（F）"       current={n.f}   target={Math.round((needs?.cal || 2000) * .25 / 9)} color={COLOR.blue} unit="g" locked={false} hint="ホルモンや細胞膜の材料。摂りすぎると体が重くなり、少なすぎると成長に影響します" />
                         </>); })()}
                       </div>
                       <div style={{ display:"flex", flexDirection:"column", gap:10, marginBottom:12 }}>
@@ -1173,8 +1246,8 @@ export default function App() {
                             <div key={weekDay + k} style={{ background:COLOR.card, borderRadius:14, padding:"14px 16px", border:`1px solid ${COLOR.border}`, display:"flex", alignItems:"center", gap:10 }}>
                               <span style={{ fontSize:22 }}>🏫</span>
                               <div>
-                                <div style={{ fontSize:13, fontWeight:700, color:COLOR.text }}>昼食：給食</div>
-                                <div style={{ fontSize:11, color:COLOR.textSub }}>給食の日です</div>
+                                <div style={{ fontSize:15, fontWeight:700, color:COLOR.text }}>昼食：給食</div>
+                                <div style={{ fontSize:13, color:COLOR.textSub }}>給食の日です</div>
                               </div>
                             </div>
                           );
@@ -1182,8 +1255,8 @@ export default function App() {
                         })}
                       </div>
                       <div style={{ display:"flex", gap:8 }}>
-                        <button onClick={() => { const n = [...weeklyPlan]; n[weekDay] = generateDailyPlan(goalId, dislikedNames); setWeeklyPlan(n); }} style={{ flex:1, padding:"10px", borderRadius:10, border:`1.5px solid ${COLOR.border}`, background:COLOR.card, fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:FONT, color:COLOR.text }}>🔄 {DAY_LABELS[weekDay]}曜だけ</button>
-                        <button onClick={handleWeekGenerate} disabled={weekLoading} style={{ flex:1, padding:"10px", borderRadius:10, border:"none", background:COLOR.accent+"12", fontSize:13, fontWeight:700, cursor:"pointer", fontFamily:FONT, color:COLOR.accent }}>🗓 全日再生成再生成</button>
+                        <button onClick={() => { const n = [...weeklyPlan]; n[weekDay] = generateDailyPlan(goalId, dislikedNames, [], needs?.cal); setWeeklyPlan(n); }} style={{ flex:1, padding:"10px", borderRadius:10, border:`1.5px solid ${COLOR.border}`, background:COLOR.card, fontSize:15, fontWeight:700, cursor:"pointer", fontFamily:FONT, color:COLOR.text }}>🔄 {DAY_LABELS[weekDay]}曜だけ</button>
+                        <button onClick={handleWeekGenerate} disabled={weekLoading} style={{ flex:1, padding:"10px", borderRadius:10, border:"none", background:COLOR.accent+"12", fontSize:15, fontWeight:700, cursor:"pointer", fontFamily:FONT, color:COLOR.accent }}>🗓 全日再生成再生成</button>
                       </div>
                     </div>
                   )}
@@ -1194,17 +1267,17 @@ export default function App() {
             {/* PY-01: PREMIUM_BANNER: 将来復活用 — 非表示 */}
             {false && !isPremium && (
               <div style={{ marginTop:16, padding:"20px 16px", borderRadius:16, background:"linear-gradient(135deg,#2c2418,#4a3828)" }}>
-                <div style={{ fontSize:11, color:"#c4a882", fontWeight:700, marginBottom:6 }}>PREMIUM</div>
-                <div style={{ fontSize:15, fontWeight:900, color:"#fff", marginBottom:4 }}>毎日の「何作ろう？」がゼロになる</div>
-                <div style={{ fontSize:12, color:"#a89880", marginBottom:10 }}>レシピ・副菜・週間献立・買い物リストが全部使える</div>
+                <div style={{ fontSize:13, color:"#c4a882", fontWeight:700, marginBottom:6 }}>PREMIUM</div>
+                <div style={{ fontSize:17, fontWeight:900, color:"#fff", marginBottom:4 }}>毎日の「何作ろう？」がゼロになる</div>
+                <div style={{ fontSize:14, color:"#a89880", marginBottom:10 }}>レシピ・副菜・週間献立・買い物リストが全部使える</div>
                 <div style={{ display:"flex", flexDirection:"column", gap:3, marginBottom:12 }}>
                   {["📝 全レシピ即表示","🥗 副菜提案＋レシピ","🙅 苦手食材 無制限","🛒 買い物リスト","📅 1週間献立","👨‍👩‍👧‍👦 家族人数調整"].map((f, i) => (
-                    <div key={i} style={{ fontSize:13, color:"#d4c4a8" }}><span style={{ color:"#e8b914" }}>✓</span> {f}</div>
+                    <div key={i} style={{ fontSize:15, color:"#d4c4a8" }}><span style={{ color:"#e8b914" }}>✓</span> {f}</div>
                   ))}
                 </div>
                 <div style={{ display:"flex", alignItems:"baseline", gap:4, marginBottom:12 }}>
                   <span style={{ fontSize:26, fontWeight:900, color:"#fff" }}>¥980</span>
-                  <span style={{ fontSize:12, color:"#a89880" }}>/月</span>
+                  <span style={{ fontSize:14, color:"#a89880" }}>/月</span>
                 </div>
                 <TrialCTA onClick={activateTrial} />
               </div>
@@ -1212,7 +1285,7 @@ export default function App() {
 
             {/* 免責テキスト */}
             <div style={{ marginTop:20, padding:"12px 14px", borderRadius:10, background:COLOR.warm, textAlign:"center" }}>
-              <p style={{ fontSize:11, color:COLOR.textSub, margin:0, lineHeight:1.7 }}>※ 本アプリの献立は参考情報です。お子さまの体調や成長に合わせて調整してください。</p>
+              <p style={{ fontSize:13, color:COLOR.textSub, margin:0, lineHeight:1.7 }}>※ 本アプリの献立は参考情報です。お子さまの体調や成長に合わせて調整してください。</p>
             </div>
           </div>
         )}
